@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "./components/Link";
+import Audio from "./components/Audio";
 
 export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
@@ -36,7 +37,10 @@ export default function Home() {
 
   return (
     <div className="relative w-full min-h-screen overflow-hidden bg-black">
+      
       <div className={`absolute inset-0 w-full h-full z-0 transition-opacity duration-1500 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}>
+
+
         <Image
           src="/hollowpurple.gif"
           alt="Cinematic background"
@@ -89,8 +93,14 @@ export default function Home() {
             ???????
           </span>
         </h1>
-        
+        <Audio 
+          audioSrc="/loveparanoia.mp3" 
+          songTitle="Love/Paranoia" 
+          artistName="Tame Impala"
+          coverArt="/currents.png"
+        />
         <div className="max-h-[70vh] bg-gradient-to-br from-gray-900/90 to-gray-800/90 p-4 sm:p-6 md:p-10 rounded-xl shadow-2xl w-full max-w-xs sm:max-w-md md:max-w-lg lg:max-w-2xl flex flex-col justify-center items-center gap-4 sm:gap-6 md:gap-8 overflow-y-auto backdrop-blur-md border border-gray-700/50 animate-float-slow transition-all duration-500 hover:shadow-purple-500/20 hover:shadow-lg">
+
           <div className="absolute inset-0 rounded-xl bg-purple-500/5 animate-pulse-slow"></div>
           
           <Link
@@ -111,6 +121,7 @@ export default function Home() {
             url="https://ddfh.org"
             className="transform hover:scale-105 hover:shadow-blue-400/30 hover:shadow-lg transition-all duration-300 w-full"
           />
+          
         </div>
         
         <div className="mt-6 sm:mt-10 text-white text-sm sm:text-lg opacity-0 animate-fadeIn animation-delay-1000">
