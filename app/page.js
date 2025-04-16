@@ -116,7 +116,7 @@ export default function Home() {
             className="transform hover:scale-105 hover:shadow-blue-400/30 hover:shadow-lg transition-all duration-300 w-full"
           />
           <Link
-            name="ddfh.org"
+            name="ddfh"
             imgSrc="/ddfh.png"
             url="https://ddfh.org"
             className="transform hover:scale-105 hover:shadow-blue-400/30 hover:shadow-lg transition-all duration-300 w-full"
