@@ -93,12 +93,7 @@ export default function Home() {
             ???????
           </span>
         </h1>
-        <Audio 
-          audioSrc="/loveparanoia.mp3" 
-          songTitle="Love/Paranoia" 
-          artistName="Tame Impala"
-          coverArt="/currents.png"
-        />
+
         <div className="max-h-[70vh] bg-gradient-to-br from-gray-900/90 to-gray-800/90 p-4 sm:p-6 md:p-10 rounded-xl shadow-2xl w-full max-w-xs sm:max-w-md md:max-w-lg lg:max-w-2xl flex flex-col justify-center items-center gap-4 sm:gap-6 md:gap-8 overflow-y-auto backdrop-blur-md border border-gray-700/50 animate-float-slow transition-all duration-500 hover:shadow-purple-500/20 hover:shadow-lg">
 
           <div className="absolute inset-0 rounded-xl bg-purple-500/5 animate-pulse-slow"></div>
