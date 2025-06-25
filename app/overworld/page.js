@@ -5,12 +5,22 @@ import GameItem from '../components/gameitem';
 import CollectItem from '../components/CollectItem';
 import PlaceItem from '../components/PlaceItem';
 
-
 const BIOME_TYPES = [
   { name: 'forest', weight: 5, gradient: 'from-green-800 via-green-900 to-green-700' },
   { name: 'desert', weight: 2, gradient: 'from-yellow-600 via-orange-800 to-yellow-400' },
   // { name: 'snow',   weight: 1, gradient: 'from-blue-300 via-white to-blue-200' },
 ];
+
+const BIOME_ENEMIES = {
+  forest: [ { type: 'wolf', weight: 3 }, { type: 'boar', weight: 1 } ],
+  desert: [ { type: 'scorpion', weight: 4 } ],
+};
+
+const ENEMY_STATS = {
+  wolf:      { size: 50, speed: 1.4, health: 50, attack: 8, attackRange: 25, attackCooldown: 500 },
+  boar:      { size: 60, speed: 0.6, health: 120, attack: 20, attackRange: 30, attackCooldown: 1000 },
+  scorpion:  { size: 40, speed: 1.6, health: 40, attack: 4,  attackRange: 20, attackCooldown: 200 },
+};
 
 const TOOL_EFFECTIVENESS = new Map([
   ['stone pickaxe', new Map([
@@ -22,6 +32,9 @@ const TOOL_EFFECTIVENESS = new Map([
     ['rock', 6],
     ['cactus', 3],
     ['dead bush', 2],
+    ['wolf', 25],
+    ['boar', 25],
+    ['scorpion', 25],
   ])],
   ['stone axe', new Map([
     ['tree', 2],
@@ -32,6 +45,9 @@ const TOOL_EFFECTIVENESS = new Map([
     ['rock', 3],
     ['cactus', 4],
     ['dead bush', 2],
+    ['wolf', 40],
+    ['boar', 40],
+    ['scorpion', 40],
   ])],
    ['stick', new Map([
     ['tree', 0.5],
@@ -42,6 +58,9 @@ const TOOL_EFFECTIVENESS = new Map([
     ['rock', 1],
     ['cactus', 2],
     ['dead bush', 1.3],
+    ['wolf', 20],
+    ['boar', 20],
+    ['scorpion', 20],
   ])],
   ['hands', new Map([
     ['bush', 0.3],
@@ -52,6 +71,9 @@ const TOOL_EFFECTIVENESS = new Map([
     ['workbench', 0.5],
     ['cactus', 0.5],
     ['dead bush', 0.8],
+    ['wolf', 10],
+    ['boar', 10],
+    ['scorpion', 10],
   ])],
 ]);
 
@@ -87,6 +109,14 @@ const LOOT_TABLE = new Map([
     { item: 'thorn', chance: 0.5, min: 1, max: 2 },
     { item: 'prickly pear', chance: 0.7, min: 1, max: 2 },
   ]],
+  ['wolf', [
+    { item: 'meat', chance: 1, min: 1, max: 3 },
+    { item: 'hide', chance: 0.5, min: 1, max: 2 },
+  ]],
+  ['boar', [
+    { item: 'meat', chance: 1, min: 2, max: 4 },
+    { item: 'hide', chance: 0.5, min: 1, max: 3 },
+  ]],
 ]);
 
 const CRAFTING_RECIPES = [
@@ -100,15 +130,15 @@ const CRAFTING_RECIPES = [
   {
     output: { item: 'workbench', quantity: 1 },
     ingredients: [
-      { item: 'wood', quantity: 2 },
-      { item: 'stick', quantity: 2 },
+      { item: 'wood', quantity: 4 },
+      { item: 'stick', quantity: 4 },
     ],
     level: 0,
   },
   {
     output: { item: 'stone axe', quantity: 1 },
     ingredients: [
-      { item: 'wood', quantity: 3 },
+      { item: 'stick', quantity: 3 },
       { item: 'rock', quantity: 1 },
     ],
     level: 1,
@@ -116,7 +146,7 @@ const CRAFTING_RECIPES = [
   {
     output: { item: 'stone pickaxe', quantity: 1 },
     ingredients: [
-      { item: 'wood', quantity: 2 },
+      { item: 'stick', quantity: 2 },
       { item: 'rock', quantity: 3 },
     ],
     level: 1,
@@ -131,6 +161,7 @@ const CONSUMABLES = [
   { item: 'wood', ability: 'PLACEABLE', amount: 10 },
   { item: 'rock', ability: 'PLACEABLE', amount: 25 },
   { item: 'workbench', ability: 'PLACEABLE', amount: 10 },
+  { item: 'meat', ability: 'STAMINA', amount: 350 },
 ]
 
 const STATION_LEVELS = new Map([
@@ -179,11 +210,15 @@ const TEXTURE_MAP = new Map([
   ['nut', '/nut.png'],
   ['thorn', '/thorn.png'],
   ['prickly pear', '/pricklypear.png'],
+  ['meat', '/meat.png'],
+    ['hide', '/hide.png'],
 ]);
 
 const VIEW_DIST = 0.45
 
 export default function GamePage() {
+  const frameRef = useRef(0);
+
   const [pos, setPos] = useState({ x: 300, y: 300 });
   const posRef = useRef(pos);
 
@@ -193,8 +228,18 @@ export default function GamePage() {
 
   const facingRef = useRef(null)
 
+  const maxHealthRef = useRef(100);
+  const healthRef = useRef(100);
+
   const [inventory, setInventory] = useState(new Map());
   const [showInventory, setShowInventory] = useState(false);
+
+  const [enemies, setEnemies] = useState([])
+  const enemiesRef = useRef(enemies)
+
+   useEffect(() => {
+    enemiesRef.current = enemies;
+  }, [enemies])
 
   const [items, setItems] = useState([]);
   const itemsRef = useRef(items);
@@ -340,7 +385,7 @@ const processItemSet = (sourceItems, multi) => {
     const toolMap = TOOL_EFFECTIVENESS.get(equippedRef.current);
     const damage = toolMap?.get(item.type) ?? 0;
 
-    if (dist < item.size) {
+    if (dist < item.size + 15 * multi) {
       item.health -= damage * multi;
 
       if (item.health <= 0) {
@@ -538,6 +583,35 @@ function unloadDistantChunks(playerX, playerY) {
   });
 }
 
+function spawnEnemies(cx, cy, biomeName) {
+  const table = BIOME_ENEMIES[biomeName] || [];
+  const totalW = table.reduce((s,e)=>s+e.weight,0);
+  const newEn = [];
+  for (let i=0; i<2; i++) {
+    let r = Math.random()*totalW, type;
+    for (const e of table) {
+      if (r < e.weight) { type = e.type; break; }
+      r -= e.weight;
+    }
+    const stats = ENEMY_STATS[type];
+    newEn.push({
+      id: crypto.randomUUID(),
+      type,
+      x: cx*CHUNK_SIZE + Math.random()*CHUNK_SIZE,
+      y: cy*CHUNK_SIZE + Math.random()*CHUNK_SIZE,
+      size: stats.size,
+      speed: stats.speed,
+      health: stats.health,
+      maxHealth: stats.health,
+      attack: stats.attack,
+      attackRange: stats.attackRange,
+      cooldown: stats.attackCooldown,
+      lastAttack: 0,
+    });
+  }
+  enemiesRef.current.push(...newEn);
+}
+
 
 useEffect(() => {
   const handleKeyUp = (e) => {
@@ -611,6 +685,7 @@ function spawnItems(count, cx, cy, biomeName) {
     const biome = getChunkBiome(cx, cy).name;
     const newItems = spawnItems(40, cx, cy, biome);
     setItems(prev => { const next = [...prev, ...newItems]; itemsRef.current = next; return next; });
+    spawnEnemies(cx, cy, biome);
     loadedChunks.current.add(key);
   }
 
@@ -620,10 +695,10 @@ const handleMovement = () => {
     let nextY = posRef.current.y;
 
     if (keys.current['shift'] && staminaRef.current >= 0) {
-        setStamina((prev) => Math.max(0, prev - 1.6));
+        staminaRef.current = Math.max(0, staminaRef.current - 1.6);
     }
 
-    setStamina((prev) => Math.min(1000, prev + 0.06))
+    staminaRef.current = Math.min(1000, staminaRef.current + 0.06);
   
     if (keys.current['w']) {
       nextY -= speed;
@@ -657,7 +732,6 @@ const handleMovement = () => {
   
     if (!blocked) {
       const newPos = { x: nextX, y: nextY };
-      setPos(newPos);
       posRef.current = newPos;
 
       const newCx = Math.floor(newPos.x / CHUNK_SIZE);
@@ -672,6 +746,61 @@ const handleMovement = () => {
     }
   };
 
+  function handleEnemyMovement() {
+  const worldObstacles = [...itemsRef.current, ...placedItemsRef.current];
+  for (const en of enemiesRef.current) {
+    // vector to player
+    const dx = posRef.current.x - en.x;
+    const dy = posRef.current.y - en.y;
+    const dist = Math.hypot(dx,dy);
+    // if far, move toward player; if too close, skip
+    if (dist > en.attackRange*0.8) {
+      const dirX = dx/dist, dirY = dy/dist;
+      const nextX = en.x + dirX*en.speed;
+      const nextY = en.y + dirY*en.speed;
+      // simple collision with world
+      let blocked=false;
+      for (const w of worldObstacles) {
+        const ddx = nextX - w.x, ddy = nextY - w.y;
+        if (Math.hypot(ddx,ddy) < (en.size*0.5 + (w.size||40)*0.5)) {
+          blocked=true; break;
+        }
+      }
+      if (!blocked) { en.x=nextX; en.y=nextY; }
+    }
+  }
+}
+
+function handleEnemyAttacks(now) {
+  for (const en of enemiesRef.current) {
+    const dx = posRef.current.x - en.x;
+    const dy = posRef.current.y - en.y;
+    const dist = Math.hypot(dx,dy);
+    if (dist < en.attackRange && now - en.lastAttack > en.cooldown) {
+      en.lastAttack = now;
+      healthRef.current = Math.max(0, healthRef.current - en.attack);
+    }
+  }
+}
+
+function processEntitySet(sourceArray, damageMult) {
+  return sourceArray.filter(ent => {
+    const dx = posRef.current.x - ent.x;
+    const dy = posRef.current.y - ent.y;
+    const toolMap = TOOL_EFFECTIVENESS.get(equippedRef.current);
+    const damage = toolMap?.get(ent.type) ?? 0;
+    if (Math.hypot(dx,dy) < ent.size * 1.3) {
+      ent.health -= damageMult * (damage || 1);
+      if (ent.health <= 0) {
+        const drops = dropLoot(ent.type, ent.x, ent.y);
+        setCollectItems((prev) => [...prev, ...drops]);
+        return false;
+      }
+    }
+    return true;
+  });
+}
+
 setInterval(() => {
   console.log(currentChunkRef.current)
   console.log(itemsRef.current.length)
@@ -685,7 +814,7 @@ setInterval(() => {
       hasBasic.current = true;
       basicPressed.current = true;
 
-      setStamina((prev) => Math.max(0, prev - 25))
+      staminaRef.current = Math.max(0, staminaRef.current - 25);
   
       const newItems = processItemSet(itemsRef.current, 1);
       const newPlaced = processItemSet(placedItemsRef.current, 1);
@@ -695,6 +824,8 @@ setInterval(() => {
 
       setPlacedItems(newPlaced);
       placedItemsRef.current = newPlaced;
+
+      enemiesRef.current = processEntitySet(enemiesRef.current, 1);
   
       changeCharacter("😆");
   
@@ -716,7 +847,7 @@ setInterval(() => {
       hasStrong.current = true;
       strongPressed.current = true;
 
-      setStamina((prev) => Math.max(0, prev - 60))
+      staminaRef.current = Math.max(0, staminaRef.current - 60);
   
       const newItems = processItemSet(itemsRef.current, 3);
       const newPlaced = processItemSet(placedItemsRef.current, 3);
@@ -726,6 +857,8 @@ setInterval(() => {
 
       setPlacedItems(newPlaced);
       placedItemsRef.current = newPlaced;
+
+      enemiesRef.current = processEntitySet(enemiesRef.current, 3);
   
       changeCharacter("😅");
   
@@ -758,7 +891,7 @@ const pickupLoop = () => {
     const dy = drop.y - playerY;
     const dist = Math.sqrt(dx * dx + dy * dy);
 
-    if (dist < 20) {
+    if (dist < 50) {
       pickedUp.push(drop);
     } else {
       kept.push(drop);
@@ -775,16 +908,29 @@ const pickupLoop = () => {
     pickupPressed.current = false;
   }, 200);
 }
-
-  requestAnimationFrame(pickupLoop);
 };
 
     let raf;
-    function loop() {
+    function loop(ts = 0) {
       handleMovement();
       handleBasicAttack();
       handleStrongAttack();
       pickupLoop();
+
+      handleEnemyMovement();
+      handleEnemyAttacks(ts);
+
+      if (++frameRef.current >= 4) {
+        setPos({ ...posRef.current });
+        setStamina(staminaRef.current);
+        setItems([...itemsRef.current]);
+        setPlacedItems([...placedItemsRef.current]);
+        setCollectItems([...collectItemsRef.current]);
+        setEnemies([...enemiesRef.current]);
+
+        frameRef.current = 0;
+      }
+
       raf = requestAnimationFrame(loop);
     }
     spawnChunk(0, 0);
@@ -815,45 +961,60 @@ const bg = getChunkBiome(center.x, center.y).gradient;
 
   return (
   <div className="relative w-screen h-screen overflow">
-<div className="fixed bottom-0 left-0 w-full bg-black/70 text-white p-2 flex flex-col items-center z-50">
-  <div className="flex gap-4 items-center">
-    <p>Stamina: {Math.floor(stamina / 10)}%</p>
-    <p>{facingRef.current}</p>
-    <button
-      onClick={() => setShowInventory((prev) => !prev)}
-      className="bg-green-700 hover:bg-green-600 px-2 py-1 rounded text-xs"
-    >
-      {showInventory ? 'Close Inventory' : 'Open Inventory'}
-    </button>
-  </div>
-</div>
+    <div className="fixed bottom-0 left-0 w-full bg-black/70 text-white p-2 flex flex-col items-center z-50">
+      <div className="flex gap-4 items-center">
+        <p>Stamina: {Math.floor(stamina / 10)}%</p>
+        <p>{facingRef.current}</p>
+        <button
+          onClick={() => setShowInventory((prev) => !prev)}
+          className="bg-green-700 hover:bg-green-600 px-2 py-1 rounded text-xs"
+        >
+          {showInventory ? 'Close Inventory' : 'Open Inventory'}
+        </button>
+      </div>
 
-<div className="fixed bottom-2 right-2 flex gap-2 z-50">
-  {hotbar.map((slot, index) => (
-    <div
-      key={index}
-      onClick={() => {handleHotbarClick(slot, index)}}
-      className={`relative w-10 h-10 border ${
-        equipped === slot.item ? 'border-yellow-400' : 'border-white'
-      } bg-black/40 rounded`}
-    >
-      {slot.item && (
-        <>
-          <img
-            src={TEXTURE_MAP.get(slot.item)}
-            className="w-full h-full object-contain"
-            alt={slot.item}
-          />
-          <div className="absolute bottom-0 right-0 bg-black/70 text-white text-[10px] px-1 rounded">
-            ×{slot.quantity}
+      <div className="fixed bottom-2 right-2 flex gap-2 z-50">
+        {hotbar.map((slot, index) => (
+          <div
+            key={index}
+            onClick={() => {handleHotbarClick(slot, index)}}
+            className={`relative w-10 h-10 border ${
+              equipped === slot.item ? 'border-yellow-400' : 'border-white'
+            } bg-black/40 rounded`}
+          >
+            {slot.item && (
+              <>
+                <img
+                  src={TEXTURE_MAP.get(slot.item)}
+                  className="w-full h-full object-contain"
+                  alt={slot.item}
+                />
+                <div className="absolute bottom-0 right-0 bg-black/70 text-white text-[10px] px-1 rounded">
+                  ×{slot.quantity}
+                </div>
+              </>
+            )}
           </div>
-        </>
-      )}
-    </div>
-  ))}
+        ))}
+      </div>
+
+<div className="w-1/4 h-4 bg-gray-700 rounded justify-center items-center flex flex-row gap-3">
+
+<p className="p-1">{healthRef.current}/{maxHealthRef.current} </p>
+  <div
+    className="h-full rounded transition-all duration-200"
+    style={{
+      width: `${(healthRef.current / maxHealthRef.current) * 100}%`,
+      backgroundColor:
+        healthRef.current > maxHealthRef.current * 0.5
+          ? 'limegreen'
+          : healthRef.current > maxHealthRef.current * 0.25
+          ? 'orange'
+          : 'red',
+    }}
+  />
 </div>
-
-
+    </div>
 
       {showInventory && (
       <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-64 bg-black/80 text-white rounded shadow-lg z-50 p-4 overflow-y-auto">
@@ -999,6 +1160,20 @@ const bg = getChunkBiome(center.x, center.y).gradient;
           playerPos={pos}
         />
       ))}
+
+      {enemies.map(en => (
+  <GameItem
+    key={en.id}
+    id={en.id}
+    x={en.x}
+    y={en.y}
+    size={en.size}
+    type={en.type}
+    health={en.health}
+    maxHealth={en.maxHealth}
+    playerPos={pos}
+  />
+))}
 
     </div>
   </div>

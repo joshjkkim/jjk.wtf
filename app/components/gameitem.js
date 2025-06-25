@@ -41,6 +41,12 @@ export default function GameItem({
       ? '/cactus.png'
       : type === 'dead bush'
       ? '/dead_bush.png'
+      : type === 'wolf'
+      ? '/wolf.gif'
+      : type === 'boar'
+      ? '/boar.gif'
+      : type === 'scorpion'
+      ? '/scorpion.gif'
       : undefined);
 
 const typeZIndex = {

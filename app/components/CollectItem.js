@@ -9,6 +9,8 @@ const COLLECTABLES_PHOTO = new Map([
     ['nut', '/nut.png'],
     ['thorn', '/thorn.png'],
     ['prickly pear', '/pricklypear.png'],
+    ['meat', '/meat.png'],
+    ['hide', '/hide.png'],
 ])
 
 export default function CollectItem({ x, y, itemType }) {
