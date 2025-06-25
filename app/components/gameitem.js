@@ -37,6 +37,10 @@ export default function GameItem({
       ? '/bush.gif'
       : type === 'tree'
       ? '/tree.gif'
+      : type === 'cactus'
+      ? '/cactus.png'
+      : type === 'dead bush'
+      ? '/dead_bush.png'
       : undefined);
 
 const typeZIndex = {
@@ -59,7 +63,8 @@ const zIndex = typeZIndex[type] ?? 0;
         height: `${size}px`,
         backgroundImage: resolvedImage ? `url('${resolvedImage}')` : undefined,
         backgroundColor: 'transparent',
-        backgroundSize: 'cover',
+        backgroundSize: 'contain',
+        backgroundRepeat: 'no-repeat',
         backgroundPosition: 'center',
         transform: 'translate(-50%, -50%)',
         borderRadius: '8px',
