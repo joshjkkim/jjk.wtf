@@ -1,15 +1,8 @@
-import { useCallback } from "react";
 import { BIOME_TYPES, BIOME_SPAWN_TABLE, TYPE_STATS, BIOME_ENEMIES, ENEMY_STATS, CHUNK_UNLOAD_RADIUS, LOOT_TABLE, TOOL_EFFECTIVENESS, TILE_VARIANTS } from "./tables";
-
-const grassVariants = [
-  '/grass1.png',
-  '/grass2.png',
-  '/grass3.png',
-];
 
 export default function worldChunks({ chunkBiomes, CHUNK_SIZE, loadedChunks, setItems, setPlacedItems, setCollectItems, equippedRef, posRef, enemiesRef, itemsRef, chunkTiles }) {
 
-    const spawnItems = useCallback((count, cx, cy, biomeName) => {
+    const spawnItems = (count, cx, cy, biomeName) => {
         const table = BIOME_SPAWN_TABLE[biomeName];
         const totalW = table.reduce((s, e) => s + e.weight, 0);
 
@@ -30,9 +23,9 @@ export default function worldChunks({ chunkBiomes, CHUNK_SIZE, loadedChunks, set
                 y: cy * CHUNK_SIZE + Math.random() * CHUNK_SIZE
             };
         });
-    }, [CHUNK_SIZE])
+    }
 
-    const spawnEnemies = useCallback((cx, cy, biomeName, count) => {
+    const spawnEnemies = (cx, cy, biomeName, count) => {
         const table = BIOME_ENEMIES[biomeName] || [];
         const totalW = table.reduce((s,e)=>s+e.weight,0);3
         const newEn = [];
@@ -59,9 +52,9 @@ export default function worldChunks({ chunkBiomes, CHUNK_SIZE, loadedChunks, set
             });
         }
         enemiesRef.current.push(...newEn);
-    }, [CHUNK_SIZE, enemiesRef])
+    }
 
-    const getChunkBiome = useCallback((cx, cy) => {
+    const getChunkBiome = (cx, cy) => {
         const key = `${cx},${cy}`;
         if (chunkBiomes.current.has(key)) return chunkBiomes.current.get(key);
 
@@ -73,9 +66,9 @@ export default function worldChunks({ chunkBiomes, CHUNK_SIZE, loadedChunks, set
         const fallback = BIOME_TYPES[0];
         chunkBiomes.current.set(key, fallback);
         return fallback;
-    }, [chunkBiomes])
+    }
 
-    const spawnChunk = useCallback((cx, cy, count = Math.ceil(Math.random() * 5)) => {
+    const spawnChunk = (cx, cy, count = Math.ceil(Math.random() * 5)) => {
         const key = `${cx},${cy}`
         if (loadedChunks.current.has(key)) return
 
@@ -92,9 +85,9 @@ export default function worldChunks({ chunkBiomes, CHUNK_SIZE, loadedChunks, set
         spawnEnemies(cx, cy, biome, count)
 
         loadedChunks.current.add(key)
-        }, [	getChunkBiome, spawnItems, spawnEnemies, loadedChunks, itemsRef, chunkTiles])
+        }
 
-    const unloadDistantChunks = useCallback((playerX, playerY) => {
+    const unloadDistantChunks = (playerX, playerY) => {
         const cx = Math.floor(playerX / CHUNK_SIZE);
         const cy = Math.floor(playerY / CHUNK_SIZE);
     
@@ -131,9 +124,9 @@ export default function worldChunks({ chunkBiomes, CHUNK_SIZE, loadedChunks, set
             );
         }
         });
-    }, [CHUNK_SIZE, loadedChunks, setItems, setPlacedItems, setCollectItems])
+    }
 
-    const dropLoot = useCallback((type, x, y) => {
+    const dropLoot = (type, x, y) => {
         const drops = LOOT_TABLE.get(type);
         if (!drops) return [];
 
@@ -149,9 +142,9 @@ export default function worldChunks({ chunkBiomes, CHUNK_SIZE, loadedChunks, set
             y: y + Math.random() * 20,
             }));
         });
-    }, []);
+    }
 
-    const processItemSet = useCallback((sourceItems, multi) => {
+    const processItemSet = (sourceItems, multi) => {
         return sourceItems.filter((item) => {
             const dx = posRef.current.x - item.x;
             const dy = posRef.current.y - item.y;
@@ -174,7 +167,7 @@ export default function worldChunks({ chunkBiomes, CHUNK_SIZE, loadedChunks, set
         
             return true;
         });
-    }, [posRef, equippedRef, setCollectItems]);
+    }
 
     return { getChunkBiome, spawnChunk, unloadDistantChunks, dropLoot, processItemSet }
 }

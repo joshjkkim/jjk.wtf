@@ -1,15 +1,13 @@
-import { useCallback } from "react";
-
 export default function playerInventory({inventory, hotbar, setHotbar, setInventory, selectedItem, setSelectedItem, setEquipped}) {
-    const addToInventory = useCallback((item, quantity = 1) => {
+    const addToInventory = (item, quantity = 1) => {
         setInventory((prev) => {
             const next = new Map(prev);
             next.set(item, (next.get(item) || 0) + quantity);
             return next;
         });
-    }, []);
+    }
 
-    const handleInventoryClick = useCallback((item) => {
+    const handleInventoryClick = (item) => {
         const newInventory = new Map(inventory);
         const currentCount = newInventory.get(item) || 0;
         if (currentCount <= 0) return;
@@ -37,10 +35,10 @@ export default function playerInventory({inventory, hotbar, setHotbar, setInvent
         }
         setHotbar(updatedHotbar);
         setInventory(newInventory);
-    }, [inventory, hotbar, setHotbar, setInventory]);
+    }
 
 
-    const handleHotbarClick = useCallback((slot, index) => {
+    const handleHotbarClick = (slot, index) => {
         if (selectedItem) {
             const updated = [...hotbar];
             if (updated[index].item === selectedItem.type) {
@@ -60,7 +58,7 @@ export default function playerInventory({inventory, hotbar, setHotbar, setInvent
             }
             setHotbar(updated);
         }
-    }, [selectedItem, hotbar, setHotbar, setSelectedItem, setEquipped]);
+    }
 
     return { addToInventory,  handleInventoryClick, handleHotbarClick }
 }

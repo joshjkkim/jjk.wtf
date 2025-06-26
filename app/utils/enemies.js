@@ -1,8 +1,7 @@
-import { useCallback } from "react";
 import { TOOL_EFFECTIVENESS } from "./tables";
 
 export default function worldEnemies({ itemsRef, placedItemsRef, posRef, enemiesRef, healthRef, dropLoot, setCollectItems, equippedRef, setItems, setPlacedItems }) {
-    const handleEnemyMovement = useCallback((now) => {
+    const handleEnemyMovement = (now) => {
         const worldObstacles = [...itemsRef.current, ...placedItemsRef.current];
         for (const en of enemiesRef.current) {
             const dx   = posRef.current.x - en.x;
@@ -52,10 +51,10 @@ export default function worldEnemies({ itemsRef, placedItemsRef, posRef, enemies
             }
             }
         }
-    }, [itemsRef, placedItemsRef, posRef, enemiesRef, dropLoot, setCollectItems, setItems, setPlacedItems]);
+    }
 
 
-    const handleEnemyAttacks = useCallback((now) => {
+    const handleEnemyAttacks = (now) => {
         for (const en of enemiesRef.current) {
             const dx = posRef.current.x - en.x;
             const dy = posRef.current.y - en.y;
@@ -65,9 +64,9 @@ export default function worldEnemies({ itemsRef, placedItemsRef, posRef, enemies
                 healthRef.current = Math.max(0, healthRef.current - en.attack);
             }
         }
-    }, [posRef, enemiesRef, healthRef])
+    }
 
-    const processEntitySet = useCallback((sourceArray, damageMult) => {
+    const processEntitySet = (sourceArray, damageMult) => {
         return sourceArray.filter(ent => {
             const dx = posRef.current.x - ent.x;
             const dy = posRef.current.y - ent.y;
@@ -83,7 +82,7 @@ export default function worldEnemies({ itemsRef, placedItemsRef, posRef, enemies
             }
             return true;
         });
-    }, [posRef, equippedRef, dropLoot, setCollectItems])
+    }
 
     return { handleEnemyMovement, handleEnemyAttacks, processEntitySet }
 }
