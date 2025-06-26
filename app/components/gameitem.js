@@ -59,7 +59,7 @@ const zIndex = typeZIndex[type] ?? 0;
 
   return (
     <div
-      className={`absolute text-xs text-white flex justify-center items-center font-mono ${
+      className={`absolute text-xs text-white flex justify-center items-center font-mono shadow-2xl p-5 bg-black/20 rounded-full ${
         wasColliding.current ? 'border-yellow-400 border-2' : 'border-transparent'
       }`}
       style={{
@@ -68,12 +68,10 @@ const zIndex = typeZIndex[type] ?? 0;
         width: `${size}px`,
         height: `${size}px`,
         backgroundImage: resolvedImage ? `url('${resolvedImage}')` : undefined,
-        backgroundColor: 'transparent',
         backgroundSize: 'contain',
         backgroundRepeat: 'no-repeat',
         backgroundPosition: 'center',
         transform: 'translate(-50%, -50%)',
-        borderRadius: '8px',
         transition: 'border 0.2s',
         zIndex: zIndex,
       }}
