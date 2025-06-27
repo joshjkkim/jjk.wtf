@@ -197,6 +197,12 @@ const visiblePlaceables = placedItems.filter(item => {
         staminaRef.current = stamina;
         setArmor(armor)
 
+        const result = await fetch('/api/home/load', { method: 'GET'})
+        const { home } = await result.json()
+
+        setPlacedItems(home);
+        placedItemsRef.current= home;
+
       } catch (err) {
         console.error(err)
       } finally {
@@ -205,6 +211,9 @@ const visiblePlaceables = placedItems.filter(item => {
     }
 
     ensureSession().then(loadGame)
+    setTimeout(() => {
+        setIsLoaded(true);
+    }, 5000);
   }, [])
 
 const { getAvailableCrafts, craftItem } = playerCrafting({ 
@@ -234,7 +243,28 @@ const { consumeItem, pickupLoop, pickupPressed, saveAndRestart } = useAction({
 })
 
   useEffect(() => {
-  const handleKeyDown = (e) => {
+        const saveHome = async () => {
+        const payload = {
+        placedItems:    placedItemsRef.current,
+        }
+
+        try {
+        const res = await fetch('/api/home/save', {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify(payload),
+        })
+        if (!res.ok) {
+            throw new Error(`Save failed: ${res.status}`)
+        }
+        await res.json()
+        } catch (e) {
+        console.error(e)
+        setAlert("Save failed. Check console.")
+        }
+    }
+
+  const handleKeyDown = async (e) => {
     const key = e.key.toLowerCase();
       keys.current[key] = true;
 
@@ -258,7 +288,8 @@ const { consumeItem, pickupLoop, pickupPressed, saveAndRestart } = useAction({
       }
 
       if (key === 'p') {
-        saveAndRestart("Rescue");
+        await saveHome();
+        saveAndRestart("Pickup");
       }
     };
 
@@ -281,30 +312,20 @@ const { consumeItem, pickupLoop, pickupPressed, saveAndRestart } = useAction({
       handleStrongAttack();
       pickupLoop();
 
-      handleEnemyMovement(ts);
-      handleEnemyAttacks(ts);
-
       if (++frameRef.current >= 4) {
         handleStamina();
         checkForDeath();
         setPos({ ...posRef.current });
         setStamina(staminaRef.current);
-        setItems([...itemsRef.current]);
         setPlacedItems([...placedItemsRef.current]);
         setCollectItems([...collectItemsRef.current]);
-        setEnemies([...enemiesRef.current]);
 
         frameRef.current = 0;
       }
 
       raf = requestAnimationFrame(loop);
     }
-    spawnChunk(0, 0, 0);
     raf = requestAnimationFrame(loop);
-
-    setTimeout(() => {
-    setIsLoaded(true);
-    }, 1000);
 
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
@@ -316,7 +337,7 @@ const { consumeItem, pickupLoop, pickupPressed, saveAndRestart } = useAction({
   if (!isLoaded) {
   return (
     <div className="w-screen h-screen bg-black text-white flex items-center justify-center">
-      Refresh the browser to enter a new world!
+      Welcome to your home!
     </div>
   );
 }
@@ -352,11 +373,11 @@ switch (facingRef.current) {
     offsetY += offsetDistance;
     break;
   default:
-    offsetX += offsetDistance; // fallback
+    offsetX += offsetDistance;
 }
 
   return (
-  <div className="relative w-screen h-screen overflow">
+  <div className="relative w-screen h-screen overflow-hidden">
     <div className="fixed bottom-0 left-0 w-full bg-black/70 text-white p-2 flex flex-col items-center z-50 gap-3">
       <div className="flex gap-4 items-center">
         
@@ -401,25 +422,15 @@ switch (facingRef.current) {
         </div>
     }
 
-     {Array.from(chunkTiles.current.entries()).map(([key, tile]) => {
-      const [cx, cy] = key.split(',').map(Number);
-      return (
-        <div
-          key={key}
-          className="absolute"
+    <div
+          className="absolute w-screen h-screen"
           style={{
-            left:            `${cx * CHUNK_SIZE}px`,
-            top:             `${cy * CHUNK_SIZE}px`,
-            width:           `${CHUNK_SIZE}px`,
-            height:          `${CHUNK_SIZE}px`,
-            backgroundImage: `url('${tile}')`,
+            backgroundImage: `url('/grass1.png')`,
             backgroundRepeat:'repeat',
             backgroundSize:  '128px 128px',
             zIndex:          0,
           }}
-        />
-      );
-    })}
+    />
 
     <div>
       {hasBasic.current && (
@@ -484,21 +495,6 @@ switch (facingRef.current) {
       }}
     />
 
-      {visibleItems.map((item) => (
-        <GameItem
-          key={item.id}
-          id={item.id}
-          x={item.x}
-          y={item.y}
-          size={item.size}
-          type={item.type}
-          image={item.image}
-          playerPos={pos}
-          health={item.health}
-          maxHealth={item.maxHealth}
-        />
-      ))}
-
       {visibleCollectables.map((drop) => (
         <CollectItem
           key={drop.id}
@@ -521,19 +517,6 @@ switch (facingRef.current) {
         />
       ))}
 
-      {enemies.map(en => (
-  <GameItem
-    key={en.id}
-    id={en.id}
-    x={en.x}
-    y={en.y}
-    size={en.size}
-    type={en.type}
-    health={en.health}
-    maxHealth={en.maxHealth}
-    playerPos={pos}
-  />
-))}
     </div>
   </div>
 );

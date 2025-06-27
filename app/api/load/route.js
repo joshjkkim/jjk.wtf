@@ -23,7 +23,7 @@ export async function GET(request) {
     }
 
     const { rows } = await pool.query(
-      `SELECT inventory, hotbar, current_health, max_health, stamina
+      `SELECT inventory, hotbar, current_health, max_health, stamina, armor
          FROM users
         WHERE id = $1`,
       [payload.userId]
@@ -35,9 +35,9 @@ export async function GET(request) {
       })
     }
 
-    const { inventory, hotbar, current_health, max_health, stamina } = rows[0]
+    const { inventory, hotbar, current_health, max_health, stamina, armor } = rows[0]
     return new Response(
-      JSON.stringify({ inventory, hotbar, health: current_health, maxHealth: max_health, stamina }),
+      JSON.stringify({ inventory, hotbar, health: current_health, maxHealth: max_health, stamina, armor }),
       {
         status: 200,
         headers: { 'Content-Type': 'application/json' },

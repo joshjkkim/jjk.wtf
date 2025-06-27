@@ -71,6 +71,7 @@ export default function useMovement({keys, staminaRef, posRef, facingRef, itemsR
       inventory: [],
       hotbar:    Array(9).fill({ item: null, quantity: 0 }),
       stamina:   1000,
+      armor: [],
     }
 
     fetch('/api/save', {

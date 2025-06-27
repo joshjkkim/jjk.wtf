@@ -6,7 +6,7 @@ export default function playerCrafting({ placedItemsRef, posRef, inventory, setI
 
         for (const item of placedItemsRef.current) {
             const stationLevel = STATION_LEVELS.get(item.type);
-            if (stationLevel >= requiredLevel) {
+            if (stationLevel == requiredLevel) {
             const dx = posRef.current.x - item.x;
             const dy = posRef.current.y - item.y;
             const dist = Math.sqrt(dx * dx + dy * dy);
@@ -18,13 +18,7 @@ export default function playerCrafting({ placedItemsRef, posRef, inventory, setI
     }
 
     const getAvailableCrafts = () => {
-        return CRAFTING_RECIPES.filter(recipe => {
-            if (!canCraftLevel(recipe.level)) return false;
-
-            return recipe.ingredients.every(({ item, quantity }) => {
-            return (inventory.get(item) || 0) >= quantity;
-            });
-        });
+        return CRAFTING_RECIPES.filter(recipe => canCraftLevel(recipe.level));
     }
 
     const craftItem = (recipe) => {

@@ -1,23 +1,47 @@
 export const BIOME_TYPES = [
-  { name: 'forest', weight: 5, gradient: 'from-green-800 via-green-900 to-green-700' },
-  { name: 'desert', weight: 2, gradient: 'from-yellow-600 via-orange-800 to-yellow-400' },
-  // { name: 'snow',   weight: 1, gradient: 'from-blue-300 via-white to-blue-200' },
+  { name: 'forest', weight: 13 },
+  { name: 'desert', weight: 6 },
+  { name: 'shallowCave', weight: 2 },
 ];
 
 export const BIOME_ENEMIES = {
-  forest: [ { type: 'wolf', weight: 3 }, { type: 'boar', weight: 1 } ],
-  desert: [ { type: 'scorpion', weight: 4 } ],
+  forest: [ { type: 'wolf', weight: 4 }, { type: 'boar', weight: 1 }, { type: 'deer', weight: 6 } ],
+  desert: [ { type: 'scorpion', weight: 8 }, { type: 'snake', weight: 4 }, { type: 'camel', weight: 2 } ],
+  shallowCave: [
+    { type: 'bat',  weight: 10 },
+    { type: 'spider', weight: 6 },
+    { type: 'rock_monster', weight: 1 },
+  ],
 };
 
 export const ENEMY_STATS = {
-  wolf:      { size: 50, speed: 0.6, health: 80, attack: 8, attackRange: 25, attackCooldown: 500 },
+  wolf:      { size: 50, speed: 0.6, health: 90, attack: 8, attackRange: 25, attackCooldown: 500 },
   boar:      { size: 60, speed: 0.4, health: 170, attack: 20, attackRange: 30, attackCooldown: 1000 },
-  scorpion:  { size: 40, speed: 0.8, health: 60, attack: 5,  attackRange: 20, attackCooldown: 700 },
+  deer:  { size: 55, speed: 0.5, health: 90, attack: 1,  attackRange: 30, attackCooldown: 1000 },
+  scorpion:  { size: 40, speed: 0.8, health: 80, attack: 5,  attackRange: 20, attackCooldown: 600 },
+  camel:  { size: 70, speed: 0.3, health: 200, attack: 2,  attackRange: 30, attackCooldown: 1000 },
+  snake:  { size: 60, speed: 0.8, health: 90, attack: 12,  attackRange: 40, attackCooldown: 1200 },
+  bat:  { size: 40, speed: 0.9, health: 80, attack: 7,  attackRange: 20, attackCooldown: 600 },
+  spider:  { size: 60, speed: 0.8, health: 100, attack: 13,  attackRange: 40, attackCooldown: 700 },
+  rock_monster:  { size: 150, speed: 0.4, health: 250, attack: 40,  attackRange: 50, attackCooldown: 1500 },
 };
 
 export const TOOL_EFFECTIVENESS = new Map([
+  ['stone sword', new Map([
+    ['wolf', 5],
+    ['boar', 5],
+    ['deer', 5],
+    ['camel', 5],
+    ['snake', 5],
+    ['scorpion', 5],
+    ['bat', 5],
+    ['spider', 5],
+    ['rock_monster', 5],
+  ])],
   ['stone pickaxe', new Map([
-    ['stone', 2],
+    ['ironNode', 0.5],
+    ['goldNode', 0.5],
+    ['stone', 1],
     ['tree', 0.2],
     ['bush', 0.1],
     ['wood', 2],
@@ -25,9 +49,15 @@ export const TOOL_EFFECTIVENESS = new Map([
     ['rock', 2],
     ['cactus', 1],
     ['dead bush', 2],
-    ['wolf', 6],
-    ['boar', 6],
-    ['scorpion', 6],
+    ['wolf', 3],
+    ['boar', 3],
+    ['deer', 3],
+    ['camel', 3],
+    ['snake', 3],
+    ['scorpion', 3],
+    ['bat', 3],
+    ['spider', 3],
+    ['rock_monster', 6],
   ])],
   ['stone axe', new Map([
     ['tree', 2],
@@ -38,9 +68,15 @@ export const TOOL_EFFECTIVENESS = new Map([
     ['rock', 3],
     ['cactus', 4],
     ['dead bush', 2],
-    ['wolf', 8],
-    ['boar', 8],
-    ['scorpion', 8],
+    ['wolf', 4],
+    ['boar', 4],
+    ['deer', 4],
+    ['camel', 4],
+    ['snake', 4],
+    ['scorpion', 4],
+    ['bat', 4],
+    ['spider', 4],
+    ['rock_monster', 4],
   ])],
    ['stick', new Map([
     ['tree', 0.5],
@@ -51,9 +87,15 @@ export const TOOL_EFFECTIVENESS = new Map([
     ['rock', 1],
     ['cactus', 2],
     ['dead bush', 1.3],
-    ['wolf', 3],
-    ['boar', 3],
-    ['scorpion', 3],
+    ['wolf', 2],
+    ['boar', 2],
+    ['deer', 2],
+    ['camel', 2],
+    ['snake', 2],
+    ['scorpion', 2],
+    ['bat', 2],
+    ['spider', 2],
+    ['rock_monster', 2],
   ])],
   ['hands', new Map([
     ['bush', 0.3],
@@ -66,7 +108,13 @@ export const TOOL_EFFECTIVENESS = new Map([
     ['dead bush', 0.8],
     ['wolf', 1],
     ['boar', 1],
+    ['deer', ],
+    ['camel', 1],
+    ['snake', 1],
     ['scorpion', 1],
+    ['bat', 1],
+    ['spider', 1],
+    ['rock_monster', 1],
   ])],
 ]);
 
@@ -77,7 +125,7 @@ export const LOOT_TABLE = new Map([
     { item: 'apple', chance: 0.7, min: 1, max: 2 },
   ]],
   ['stone', [
-    { item: 'rock', chance: 1.0, min: 1, max: 2 },
+    { item: 'rock', chance: 1, min: 1, max: 2 },
     { item: 'coal', chance: 0.2, min: 1, max: 1 }
   ]],
   ['bush', [
@@ -102,6 +150,19 @@ export const LOOT_TABLE = new Map([
     { item: 'thorn', chance: 0.5, min: 1, max: 2 },
     { item: 'prickly pear', chance: 0.7, min: 1, max: 2 },
   ]],
+  ['ironNode', [
+    { item: 'rock', chance: 1, min: 2, max: 4 },
+    { item: 'coal', chance: 0.8, min: 2, max: 3 },
+    { item: 'iron ore', chance: 0.8, min: 1, max: 3 },
+  ]],
+  ['goldnode', [
+    { item: 'rock', chance: 1, min: 2, max: 5 },
+    { item: 'coal', chance: 0.9, min: 3, max: 4 },
+    { item: 'gold ore', chance: 0.9, min: 1, max: 2 },
+  ]],
+
+
+  //Mobs
   ['wolf', [
     { item: 'meat', chance: 1, min: 1, max: 3 },
     { item: 'hide', chance: 0.5, min: 1, max: 2 },
@@ -109,6 +170,35 @@ export const LOOT_TABLE = new Map([
   ['boar', [
     { item: 'meat', chance: 1, min: 2, max: 4 },
     { item: 'hide', chance: 0.5, min: 1, max: 3 },
+  ]],
+  ['deer', [
+    { item: 'meat', chance: 1, min: 1, max: 2 },
+    { item: 'hide', chance: 0.5, min: 1, max: 1 },
+  ]],
+  ['scorpion', [
+    { item: 'meat', chance: 1, min: 1, max: 2 },
+    { item: 'fang', chance: 0.5, min: 1, max: 1 },
+  ]],
+  ['snake', [
+    { item: 'meat', chance: 1, min: 2, max: 3 },
+    { item: 'fang', chance: 0.8, min: 1, max: 2 },
+  ]],
+  ['camel', [
+    { item: 'meat', chance: 1, min: 4, max: 5 },
+    { item: 'hide', chance: 1, min: 3, max: 5 },
+  ]],
+  ['bat', [
+    { item: 'meat', chance: 1, min: 1, max: 2 },
+    { item: 'bat wing', chance: 0.5, min: 1, max: 1 },
+  ]],
+  ['spider', [
+    { item: 'meat', chance: 1, min: 2, max: 3 },
+    { item: 'fang', chance: 0.5, min: 1, max: 1 },
+  ]],
+  ['rock_monster', [
+    { item: 'rock', chance: 1, min: 10, max: 20 },
+    { item: 'gold ore', chance: 1, min: 1, max: 5 },
+    { item: 'iron ore', chance: 1, min: 5, max: 10 },
   ]],
 ]);
 
@@ -121,6 +211,14 @@ export const CRAFTING_RECIPES = [
     level: 0,
   },
   {
+    output: { item: 'bone', quantity: 1 },
+    ingredients: [
+      { item: 'meat', quantity: 1 },
+      { item: 'rock', quantity: 1 },
+    ],
+    level: 0,
+  },
+  {
     output: { item: 'workbench', quantity: 1 },
     ingredients: [
       { item: 'wood', quantity: 8 },
@@ -129,9 +227,58 @@ export const CRAFTING_RECIPES = [
     level: 0,
   },
   {
+    output: { item: 'leaf boots', quantity: 1 },
+    ingredients: [
+      { item: 'leaf', quantity: 5 },
+      { item: 'thorn', quantity: 5 },
+      { item: 'stick', quantity: 3 },
+    ],
+    level: 1,
+  },
+  {
+    output: { item: 'leaf helmet', quantity: 1 },
+    ingredients: [
+      { item: 'leaf', quantity: 6 },
+      { item: 'thorn', quantity: 7 },
+      { item: 'stick', quantity: 5 },
+    ],
+    level: 1,
+  },
+  {
+    output: { item: 'leaf plate', quantity: 1 },
+    ingredients: [
+      { item: 'leaf', quantity: 10 },
+      { item: 'apple', quantity: 3 },
+      { item: 'thorn', quantity: 8 },
+      { item: 'stick', quantity: 3 },
+    ],
+    level: 1,
+  },
+  {
+    output: { item: 'leaf pants', quantity: 1 },
+    ingredients: [
+      { item: 'leaf', quantity: 12 },
+      { item: 'thorn', quantity: 1 },
+      { item: 'stick', quantity: 2 },
+    ],
+    level: 1,
+  },
+  {
+    output: { item: 'stone sword', quantity: 1 },
+    ingredients: [
+      { item: 'stick', quantity: 3 },
+      { item: 'bone', quantity: 2 },
+      { item: 'rock', quantity: 8 },
+      { item: 'fang', quantity: 1 },
+      { item: 'thorn', quantity: 1 },
+    ],
+    level: 1,
+  },
+  {
     output: { item: 'stone axe', quantity: 1 },
     ingredients: [
-      { item: 'stick', quantity: 10 },
+      { item: 'stick', quantity: 8 },
+      { item: 'bone', quantity: 2 },
       { item: 'rock', quantity: 3 },
     ],
     level: 1,
@@ -139,7 +286,8 @@ export const CRAFTING_RECIPES = [
   {
     output: { item: 'stone pickaxe', quantity: 1 },
     ingredients: [
-      { item: 'stick', quantity: 8 },
+      { item: 'stick', quantity: 6 },
+      { item: 'bone', quantity: 2 },
       { item: 'rock', quantity: 6 },
     ],
     level: 1,
@@ -174,9 +322,10 @@ export const BIOME_SPAWN_TABLE = {
     { type: 'cactus', weight: 4 },
     { type: 'stone',   weight: 2 }
   ],
-  snow: [
-    { type: 'ice',      weight: 3 },
-    { type: 'snowBush', weight: 2 }
+  shallowCave: [
+    { type: 'stone',      weight: 40 },
+    { type: 'ironNode', weight: 4 },
+    { type: 'goldNode', weight: 2 }
   ],
 };
 
@@ -186,12 +335,16 @@ export const TYPE_STATS = new Map([
   ['cactus',   { size: 80,  healthRange: [10, 16] }],
   ['bush',   { size: 30,  healthRange: [3, 5] }],
   ['dead bush',   { size: 50,  healthRange: [2, 6] }],
+  ['ironNode',   { size: 70,  healthRange: [20, 30] }],
+  ['goldNode',   { size: 90,  healthRange: [60, 80] }],
 ]);
 
 export const TEXTURE_MAP = new Map([
   ['hands', '/fist.png'],
   ['stone pickaxe', '/pickaxe.png'],
   ['stone axe', '/axe.png'],
+  ['stone sword', '/stone_sword.png'],
+  ['bone', '/bone.png'],
   ['wood', '/wood.png'],
   ['berry', '/berry.png'],
   ['coal', '/coal.png'],
@@ -204,7 +357,18 @@ export const TEXTURE_MAP = new Map([
   ['thorn', '/thorn.png'],
   ['prickly pear', '/pricklypear.png'],
   ['meat', '/meat.png'],
-    ['hide', '/hide.png'],
+  ['hide', '/hide.png'],
+  ['walkietalkie', '/walkietalkie.gif'],
+  ['bat wing', '/bat_wing.png'],
+  ['fang', '/stinger.png'],
+  ['gold ore', '/gold_ore.png'],
+  ['iron ore', '/iron_ore.png'],
+  ['raw gold', '/raw_gold.png'],
+  ['raw iron', '/raw_iron.png'],
+  ['leaf boots', '/leaf_boots.png'],
+  ['leaf helmet', '/leaf_helmet.png'],
+  ['leaf plate', '/leaf_plate.png'],
+  ['leaf pants', '/leaf_pants.png'],
 ]);
 
 export const VIEW_DIST = 0.5
@@ -214,4 +378,12 @@ export const CHUNK_UNLOAD_RADIUS = 1;
 export const  TILE_VARIANTS = {
   forest: ['/grass1.png','/grass2.png','/grass3.png'],
   desert: ['/sand1.png','/sand2.png'],
+  shallowCave: ['/rock1.png'],
 }
+
+export const ARMOR_STATS = {
+  'leaf helmet': { slot: 'helmet', bonusHealth: 10 },
+  'leaf plate':  { slot: 'plate',  bonusHealth: 15 },
+  'leaf pants':  { slot: 'pants',  bonusHealth: 10 },
+  'leaf boots':  { slot: 'boots',  bonusHealth: 5 },
+};

@@ -1,4 +1,6 @@
-export default function playerInventory({inventory, hotbar, setHotbar, setInventory, selectedItem, setSelectedItem, setEquipped}) {
+import { ARMOR_STATS } from "./tables";
+
+export default function playerInventory({hotbar, setHotbar, setInventory, selectedItem, setSelectedItem, setEquipped, setArmor, inventory}) {
     const addToInventory = (item, quantity = 1) => {
         setInventory((prev) => {
             const next = new Map(prev);
@@ -8,34 +10,61 @@ export default function playerInventory({inventory, hotbar, setHotbar, setInvent
     }
 
     const handleInventoryClick = (item) => {
-        const newInventory = new Map(inventory);
-        const currentCount = newInventory.get(item) || 0;
-        if (currentCount <= 0) return;
 
-        const updatedHotbar = [...hotbar];
+        const armorInfo = ARMOR_STATS[item];
+        if (armorInfo) {
+            const { slot } = armorInfo;
 
-        let targetIndex = updatedHotbar.findIndex(slot => slot.item === item);
+            setInventory(inv => {
+            const next = new Map(inv);
+            const cnt = next.get(item);
+            if (cnt <= 1) next.delete(item);
+            else next.set(item, cnt - 1);
+            return next;
+            });
 
-        if (targetIndex === -1) {
-            targetIndex = updatedHotbar.findIndex(slot => !slot.item);
+            setArmor(prev => {
+            const oldItem = prev[slot];
+            if (oldItem) {
+                setInventory(inv => {
+                const next = new Map(inv);
+                next.set(oldItem, (next.get(oldItem) || 0) + 1);
+                return next;
+                });
+            }
+            return { ...prev, [slot]: item };
+            });
+            return;
         }
 
-        if (targetIndex === -1) return;
+         const newInventory = new Map(inventory);
+            const currentCount = newInventory.get(item) || 0;
+            if (currentCount <= 0) return;
 
-        if (updatedHotbar[targetIndex].item === item) {
-            updatedHotbar[targetIndex].quantity += 1;
-        } else {
-            updatedHotbar[targetIndex] = { item, quantity: 1 };
-        }
+            const updatedHotbar = [...hotbar];
 
-        if (currentCount === 1) {
-            newInventory.delete(item);
-        } else {
-            newInventory.set(item, currentCount - 1);
-        }
-        setHotbar(updatedHotbar);
-        setInventory(newInventory);
-    }
+            let targetIndex = updatedHotbar.findIndex(slot => slot.item === item);
+
+            if (targetIndex === -1) {
+                targetIndex = updatedHotbar.findIndex(slot => !slot.item);
+            }
+
+            if (targetIndex === -1) return;
+
+            if (updatedHotbar[targetIndex].item === item) {
+                updatedHotbar[targetIndex].quantity += 1;
+            } else {
+                updatedHotbar[targetIndex] = { item, quantity: 1 };
+            }
+
+            if (currentCount === 1) {
+                newInventory.delete(item);
+            } else {
+                newInventory.set(item, currentCount - 1);
+            }
+            setHotbar(updatedHotbar);
+            setInventory(newInventory);
+    };
 
 
     const handleHotbarClick = (slot, index) => {
@@ -60,6 +89,18 @@ export default function playerInventory({inventory, hotbar, setHotbar, setInvent
         }
     }
 
-    return { addToInventory,  handleInventoryClick, handleHotbarClick }
+    function handleArmorClick(slotKey, equippedItem) {
+    if (!equippedItem) return
+    // remove from armor
+    setArmor(prev => ({ ...prev, [slotKey]: null }))
+    // add back to inventory
+    setInventory(inv => {
+      const next = new Map(inv)
+      next.set(equippedItem, (next.get(equippedItem) || 0) + 1)
+      return next
+    })
+  }
+
+    return { addToInventory,  handleInventoryClick, handleHotbarClick, handleArmorClick }
 }
 

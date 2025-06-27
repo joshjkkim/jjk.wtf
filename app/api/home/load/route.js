@@ -2,7 +2,7 @@ import pool from '@/app/lib/db'
 import jwt from 'jsonwebtoken'
 import { parse } from 'cookie'
 
-export async function POST(request) {
+export async function GET(request) {
   try {
     const cookieHeader = request.headers.get('cookie') || ''
     const { token } = parse(cookieHeader)
@@ -22,34 +22,27 @@ export async function POST(request) {
       })
     }
 
-    let { health, maxHealth, inventory, hotbar, stamina, armor } = await request.json()
-    console.log("MEOW", armor)
-    const s = Math.floor(stamina)
-
-    await pool.query(
-      `UPDATE users
-         SET inventory   = $1::jsonb,
-             hotbar      = $2::jsonb,
-             current_health      = $3,
-             max_health  = $4,
-             stamina = $6,
-             armor = $7::jsonb
-       WHERE id = $5`,
-      [
-        JSON.stringify(inventory),
-        JSON.stringify(hotbar),
-        health,
-        maxHealth,
-        payload.userId,
-        s,
-        armor
-      ]
+    const { rows } = await pool.query(
+      `SELECT home
+         FROM users
+        WHERE id = $1`,
+      [payload.userId]
     )
+    if (!rows.length) {
+      return new Response(JSON.stringify({ error: 'No save found' }), {
+        status: 404,
+        headers: { 'Content-Type': 'application/json' },
+      })
+    }
 
-    return new Response(JSON.stringify({ success: true }), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' },
-    })
+    const { home } = rows[0]
+    return new Response(
+      JSON.stringify({ home }),
+      {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    )
   } catch (err) {
     console.error(err)
     return new Response(JSON.stringify({ error: 'Server error' }), {

@@ -22,27 +22,15 @@ export async function POST(request) {
       })
     }
 
-    let { health, maxHealth, inventory, hotbar, stamina, armor } = await request.json()
-    console.log("MEOW", armor)
-    const s = Math.floor(stamina)
+    let { placedItems } = await request.json()
 
     await pool.query(
       `UPDATE users
-         SET inventory   = $1::jsonb,
-             hotbar      = $2::jsonb,
-             current_health      = $3,
-             max_health  = $4,
-             stamina = $6,
-             armor = $7::jsonb
-       WHERE id = $5`,
+         SET home   = $1::jsonb
+       WHERE id = $2`,
       [
-        JSON.stringify(inventory),
-        JSON.stringify(hotbar),
-        health,
-        maxHealth,
+        JSON.stringify(placedItems),
         payload.userId,
-        s,
-        armor
       ]
     )
 

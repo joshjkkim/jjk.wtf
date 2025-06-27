@@ -127,22 +127,27 @@ export default function worldChunks({ chunkBiomes, CHUNK_SIZE, loadedChunks, set
     }
 
     const dropLoot = (type, x, y) => {
-        const drops = LOOT_TABLE.get(type);
-        if (!drops) return [];
+    const key = String(type).trim().toLowerCase();
 
-        return drops.flatMap(({ item, chance, min, max }) => {
-            if (Math.random() > chance) return [];
-
-            const amount = Math.floor(Math.random() * (max - min + 1)) + min;
-
-            return Array.from({ length: amount }, () => ({
-            id: crypto.randomUUID(),
-            type: item,
-            x: x + Math.random() * 20,
-            y: y + Math.random() * 20,
-            }));
-        });
+    const drops = LOOT_TABLE.get(key);
+    if (!drops) {
+        console.warn(`No loot table for type "${type}" (normalized "${key}")`);
+        return [];
     }
+
+    return drops.flatMap(({ item, chance, min, max }) => {
+        if (Math.random() > chance) return [];
+
+        const amount = Math.floor(Math.random() * (max - min + 1)) + min;
+
+        return Array.from({ length: amount }, () => ({
+        id:   crypto.randomUUID(),
+        type: item,
+        x:    x + Math.random() * 20 - 10,
+        y:    y + Math.random() * 20 - 10,
+        }));
+    });
+    };
 
     const processItemSet = (sourceItems, multi) => {
         return sourceItems.filter((item) => {
