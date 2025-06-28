@@ -88,7 +88,7 @@ export default function useAction({equippedRef, hotbarRef, setStamina, posRef, f
             addToInventory(type, quantity);
         }}
 
-    const saveAndRestart = useCallback(async (message) => {
+    const saveAndRestart = useCallback(async (message, destination) => {
         setEquipped("walkietalkie")
         
         let count = 10
@@ -123,7 +123,7 @@ export default function useAction({equippedRef, hotbarRef, setStamina, posRef, f
             }
             await res.json()
             setAlert(`${message} landed! Restarting…`)
-            router.push('/login')
+            router.push(destination)
             } catch (e) {
             console.error(e)
             setAlert("Save failed. Check console.")

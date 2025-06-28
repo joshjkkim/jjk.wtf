@@ -17,6 +17,7 @@ import playerCrafting from '../utils/crafting';
 import worldChunks from '../utils/chunks';
 import worldEnemies from '../utils/enemies';
 import { InventoryModal, CraftingPanel, Hotbar, StatusBar } from '../components/HUD';
+import LoadingScreen from '../components/loading';
 
 
 export default function GamePage() {
@@ -205,8 +206,6 @@ const visiblePlaceables = placedItems.filter(item => {
 
       } catch (err) {
         console.error(err)
-      } finally {
-        setIsLoaded(true)
       }
     }
 
@@ -289,7 +288,7 @@ const { consumeItem, pickupLoop, pickupPressed, saveAndRestart } = useAction({
 
       if (key === 'p') {
         await saveHome();
-        saveAndRestart("Pickup");
+        saveAndRestart("Pickup", "/world");
       }
     };
 
@@ -336,9 +335,7 @@ const { consumeItem, pickupLoop, pickupPressed, saveAndRestart } = useAction({
 
   if (!isLoaded) {
   return (
-    <div className="w-screen h-screen bg-black text-white flex items-center justify-center">
-      Welcome to your home!
-    </div>
+    <LoadingScreen pos={pos}ds/>
   );
 }
 
@@ -378,25 +375,48 @@ switch (facingRef.current) {
 
   return (
   <div className="relative w-screen h-screen overflow-hidden">
-    <div className="fixed bottom-0 left-0 w-full bg-black/70 text-white p-2 flex flex-col items-center z-50 gap-3">
-      <div className="flex gap-4 items-center">
-        
+     <div className="fixed inset-0 z-50 pointer-events-none">
+
+    <div className="w-1/3 bg-gradient-to-br from-slate-800/90 to-slate-900/95 backdrop-blur-xl rounded-2xl p-4 border border-slate-600/30 shadow-2xl space-y-3 pointer-events-auto">
+      <StatusBar 
+            label="Health" 
+            value={healthRef.current} 
+            max={maxHealthRef.current} 
+            thresholds={[.25,.5]} 
+            colors={['#ef4444','#f97316','#22c55e']} 
+          />
+          <StatusBar 
+            label="Stamina" 
+            value={stamina/10} 
+            max={100} 
+            thresholds={[.25,.75]} 
+            colors={['#ef4444','#f97316','#6b7280']} 
+          />
+    </div>
+          
+
+
+
+      <div className="absolute top-4 left-1/2 transform -translate-x-1/2 pointer-events-auto">
         <button
           onClick={() => setShowInventory((prev) => !prev)}
-          className="bg-green-700 hover:bg-green-600 px-2 py-1 rounded text-xs"
+          className="group relative px-6 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 rounded-2xl font-bold text-white transition-all duration-300 ease-out hover:scale-105 hover:shadow-lg hover:shadow-emerald-500/30 backdrop-blur-xl border border-emerald-600/30"
         >
-          {showInventory ? 'Close Inventory' : 'Open Inventory'}
+          <div className="absolute inset-0 bg-gradient-to-r from-emerald-400/20 to-teal-400/20 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+          <span className="relative flex items-center gap-2">
+            <span className="text-xl">🎒</span>
+            {showInventory ? 'Close Inventory' : 'Open Inventory'}
+          </span>
         </button>
       </div>
 
-    <Hotbar
-      hotbar={hotbarRef.current}
-      equipped={equippedRef.current}
-      onHotbarClick={handleHotbarClick}
-    />
-
-        <StatusBar label="Health"  value={healthRef.current} max={maxHealthRef.current} thresholds={[.25,.5]} colors={['red','orange','limegreen']} />
-        <StatusBar label="Stamina" value={stamina/10} max={100} thresholds={[.25,.75]} colors={['red','orange','gray']} />
+      <div className="absolute left-1/2 bottom-2 transform pointer-events-auto">
+        <Hotbar
+          hotbar={hotbarRef.current}
+          equipped={equippedRef.current}
+          onHotbarClick={handleHotbarClick}
+        />
+      </div>
     </div>
 
     <InventoryModal
@@ -416,12 +436,45 @@ switch (facingRef.current) {
         isOpen={showInventory}
       />
 
-    {alert && 
-        <div className="fixed top-1/6 bg-black/70 w-screen h-[6rem] z-9 font-mono flex justify-center items-center">
-          <h1 className="text-4xl">{alert}</h1>
+    {alert && (
+        <div className="fixed top-8 inset-x-0 mx-auto w-11/12 max-w-md bg-red-800/90 text-white font-mono rounded-lg shadow-lg z-50 animate-slide-down">
+          <div className="px-4 py-2 flex items-center justify-center space-x-2">
+            <span className="text-2xl">⚠️</span>
+            <h1 className="text-lg">{alert}</h1>
+          </div>
         </div>
-    }
+      )}
 
+      {/* Keyframes for slide-down */}
+      <style jsx>{`
+        @keyframes slide-down {
+          from { transform: translateY(-100%); opacity: 0; }
+          to   { transform: translateY(0);     opacity: 1; }
+        }
+        .animate-slide-down {
+          animation: slide-down 0.4s ease-out;
+        }
+      `}</style>
+
+     {Array.from(chunkTiles.current.entries()).map(([key, tile]) => {
+      const [cx, cy] = key.split(',').map(Number);
+      return (
+        <div
+          key={key}
+          className="absolute transition-opacity duration-500"
+          style={{
+            left: `${cx * CHUNK_SIZE}px`,
+            top: `${cy * CHUNK_SIZE}px`,
+            width: `${CHUNK_SIZE}px`,
+            height: `${CHUNK_SIZE}px`,
+            backgroundImage: `url('${tile}')`,
+            backgroundRepeat:'repeat',
+            backgroundSize:  '128px 128px',
+            opacity: 0.8,
+          }}
+        />
+      );
+    })}
     <div
           className="absolute w-screen h-screen"
           style={{

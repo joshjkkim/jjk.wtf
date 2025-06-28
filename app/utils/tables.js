@@ -371,6 +371,8 @@ export const TEXTURE_MAP = new Map([
   ['leaf pants', '/leaf_pants.png'],
 ]);
 
+export const ALL_TEXTURES = Array.from(TEXTURE_MAP.values());
+
 export const VIEW_DIST = 0.5
 
 export const CHUNK_UNLOAD_RADIUS = 1;
