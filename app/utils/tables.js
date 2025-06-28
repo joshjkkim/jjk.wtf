@@ -377,6 +377,10 @@ export const VIEW_DIST = 0.5
 
 export const CHUNK_UNLOAD_RADIUS = 1;
 
+export const MAX_SLOTS = 7;
+
+export const MAX_STACK = 50;
+
 export const  TILE_VARIANTS = {
   forest: ['/grass1.png','/grass2.png','/grass3.png'],
   desert: ['/sand1.png','/sand2.png'],
@@ -389,3 +393,7 @@ export const ARMOR_STATS = {
   'leaf pants':  { slot: 'pants',  bonusHealth: 10 },
   'leaf boots':  { slot: 'boots',  bonusHealth: 5 },
 };
+
+export const STORAGE_STATS = [
+  { item: 'chest', inventory: 20 },
+]

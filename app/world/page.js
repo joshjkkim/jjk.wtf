@@ -211,7 +211,7 @@ const { getAvailableCrafts, craftItem } = playerCrafting({
 })
 
 const { addToInventory, handleInventoryClick, handleHotbarClick, handleArmorClick } = playerInventory({ 
-  inventory, hotbar, setHotbar, setInventory, selectedItem, setSelectedItem, setEquipped, setArmor, inventory
+  inventory, hotbar, setHotbar, setInventory, selectedItem, setSelectedItem, setEquipped, setArmor, inventory, setAlert
 })
 
 const { getChunkBiome, spawnChunk, unloadDistantChunks, dropLoot, processItemSet } = worldChunks({

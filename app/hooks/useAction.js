@@ -1,5 +1,5 @@
 import { useCallback, useRef } from "react";
-import { CONSUMABLES } from "../utils/tables";
+import { CONSUMABLES, MAX_SLOTS, MAX_STACK } from "../utils/tables";
 import { useRouter } from "next/navigation";
 
 export default function useAction({equippedRef, hotbarRef, setStamina, posRef, facingRef, setPlacedItems, setEquipped, setHotbar, keys, collectItemsRef, addToInventory, setCollectItems, inventoryRef, healthRef, maxHealthRef, staminaRef, setAlert, armorRef, placedItemsRef}) {
@@ -63,30 +63,48 @@ export default function useAction({equippedRef, hotbarRef, setStamina, posRef, f
         if (isDown && !prevERef.current) {
             doPickup();
         }
-
         prevERef.current = isDown;
         }, [keys, posRef, collectItemsRef, addToInventory, setCollectItems]);
 
-        function doPickup() {
+    function doPickup() {
         const playerX = posRef.current.x;
         const playerY = posRef.current.y;
 
-        const kept = [];
-        const picked = [];
+        const newKept = [];
+        const toAdd   = [];
 
         for (const drop of collectItemsRef.current) {
             const dx = drop.x - playerX;
             const dy = drop.y - playerY;
-            if (Math.hypot(dx, dy) < 50) picked.push(drop);
-            else kept.push(drop);
+            if (Math.hypot(dx, dy) < 50) {
+            toAdd.push(drop);
+            } else {
+            newKept.push(drop);
+            }
         }
 
-        collectItemsRef.current = kept;
-        setCollectItems(kept);
+        for (const { type, quantity = 1 } of toAdd) {
+            const inv     = inventoryRef.current;
+            const current = inv.get(type) || 0;
+            const hasSlot = inv.has(type) || inv.size < MAX_SLOTS;
 
-        for (const { type, quantity = 1 } of picked) {
+            if (!hasSlot) {
+            setAlert('Inventory is full!');
+            newKept.push({ id: crypto.randomUUID(), type , x: playerX, y: playerY });
+            continue;
+            }
+            if (current + quantity > MAX_STACK) {
+            setAlert(`${type} stack is full! (max ${MAX_STACK})`);
+            newKept.push({ id: crypto.randomUUID(), type , x: playerX, y: playerY });
+            continue;
+            }
+
             addToInventory(type, quantity);
-        }}
+        }
+
+        collectItemsRef.current = newKept;
+        setCollectItems(newKept);
+    }
 
     const saveAndRestart = useCallback(async (message, destination) => {
         setEquipped("walkietalkie")
