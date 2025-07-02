@@ -228,9 +228,15 @@ const { handleMovement, handleStamina, checkForDeath } = useMovement({
 const { handleBasicAttack, handleStrongAttack, hasBasic, hasStrong } = useAttack({
   keys, staminaRef, itemsRef, placedItemsRef, enemiesRef, setItems, setPlacedItems, processEntitySet, processItemSet, changeCharacter
 })
-const { consumeItem, pickupLoop, pickupPressed, saveAndRestart } = useAction({
+const { consumeItem, pickupLoop, pickupPressed, saveAndRestart, openChestLoop, openChestId } = useAction({
   equippedRef, hotbarRef, setStamina, posRef, facingRef, setPlacedItems, setEquipped, setHotbar, keys, collectItemsRef, addToInventory, setCollectItems, inventoryRef, healthRef, maxHealthRef, staminaRef, setAlert, armorRef
 })
+
+  const [chestInv, setChestInv] = useState(null);
+
+  useEffect(() => {
+    setChestInv(openChestId);
+  }, [openChestId]);
 
   useEffect(() => {
   const handleKeyDown = (e) => {
@@ -279,6 +285,7 @@ const { consumeItem, pickupLoop, pickupPressed, saveAndRestart } = useAction({
       handleBasicAttack();
       handleStrongAttack();
       pickupLoop();
+      openChestLoop();
 
       handleEnemyMovement(ts);
       handleEnemyAttacks(ts);

@@ -1,11 +1,13 @@
-import { useCallback, useRef } from "react";
-import { CONSUMABLES, MAX_SLOTS, MAX_STACK } from "../utils/tables";
+import { useState, useCallback, useRef } from "react";
+import { CONSUMABLES, MAX_SLOTS, MAX_STACK, STORAGE_STATS } from "../utils/tables";
 import { useRouter } from "next/navigation";
+import playerStorage from "../utils/storage";
 
 export default function useAction({equippedRef, hotbarRef, setStamina, posRef, facingRef, setPlacedItems, setEquipped, setHotbar, keys, collectItemsRef, addToInventory, setCollectItems, inventoryRef, healthRef, maxHealthRef, staminaRef, setAlert, armorRef, placedItemsRef}) {
     const router = useRouter()
     const countdownRef = useRef()
     const pickupPressed = useRef(false);
+    const [openChestId, setOpenChestId] = useState(null);
     
     const consumeItem = useCallback(() => {
         const held = equippedRef.current;
@@ -31,6 +33,9 @@ export default function useAction({equippedRef, hotbarRef, setStamina, posRef, f
             facing === 'down' ? pos.y + offset :
             facing === 'up' ? pos.y - offset : pos.y;
 
+            let invAmt = STORAGE_STATS.find(c => c.item === held).inventory;
+            if (!invAmt) invAmt = 0;
+
             const placed = {
             id: crypto.randomUUID(),
             size: 40,
@@ -39,6 +44,8 @@ export default function useAction({equippedRef, hotbarRef, setStamina, posRef, f
             y: newY,
             health: consumable.amount,
             maxHealth: consumable.amount,
+            invAmount: invAmt,
+            inventory: invAmt ? new Map() : null,
             };
 
             setPlacedItems(prev => [...prev, placed]);
@@ -156,6 +163,17 @@ export default function useAction({equippedRef, hotbarRef, setStamina, posRef, f
     staminaRef, router,
   ])
 
+    const openChestLoop = useCallback(() => {
+        const down = keys.current['e'];
+        if (down && !prevERef.current) {
+            const chestInv = playerStorage({ placedItemsRef, posRef }).getNearbyChest();
+            if (chestInv) {
+            setOpenChestId(chestInv);
+            }
+        }
+        prevERef.current = down;
+    }, [keys, placedItemsRef, posRef]);
+
     const saveHome = useCallback(async () => {
         const payload = {
             health:    placedItemsRef.current,
@@ -179,7 +197,7 @@ export default function useAction({equippedRef, hotbarRef, setStamina, posRef, f
         }
     })
 
-    return { consumeItem, pickupLoop, pickupPressed, saveAndRestart }
+    return { consumeItem, pickupLoop, pickupPressed, saveHome, saveAndRestart, openChestLoop, openChestId }
 }
 
 
