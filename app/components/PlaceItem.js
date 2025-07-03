@@ -4,6 +4,7 @@ const PLACEABLES_TEXTURE = new Map([
   ['wood', '/wood_wall.png'],
   ['rock', '/stone_wall.png'],
   ['workbench', '/workbench.png'],
+  ['chest', '/chest.png'],
 ]);
 
 export default function PlaceItem({

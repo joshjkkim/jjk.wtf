@@ -56,47 +56,45 @@ export default function playerInventory({hotbar, setHotbar, setInventory, select
             return;
         }
 
-        setInventory(inv => {
-            const next = new Map(inv);
-            const currentCount = next.get(item) || 0;
-            if (currentCount <= 0) return inv;
+        const currentHotbar = hotbar;
+        const currentInv = inventory;
 
-            const updatedHotbar = [...hotbar];
-            let targetIndex = updatedHotbar.findIndex(s => s.item === item);
-            if (targetIndex === -1) {
-                targetIndex = updatedHotbar.findIndex(s => !s.item);
-                if (targetIndex === -1) {
-                    setAlert('Hotbar is full!');
-                    setTimeout(() => {
-                        setAlert("");
-                    }, 3000)
-                    return inv;
-                }
+        const nextHotbar = [...currentHotbar];
+        const nextInv    = new Map(currentInv);
+
+        let idx = nextHotbar.findIndex(s => s.item === item);
+        if (idx === -1) {
+            idx = nextHotbar.findIndex(s => !s.item);
+            if (idx === -1) {
+
+            setAlert('Hotbar is full!');
+            setTimeout(() => setAlert(''), 3000);
+            return;
             }
+        }
 
-            const existingQty = updatedHotbar[targetIndex].item === item
-            ? updatedHotbar[targetIndex].quantity
+        const existingQty = nextHotbar[idx].item === item
+            ? nextHotbar[idx].quantity
             : 0;
-            if (existingQty + 1 > MAX_STACK) {
-                setAlert(`${item} stack is full! (max ${MAX_STACK})`);
-                setTimeout(() => {
-                    setAlert("");
-                }, 3000)
-                return inv;
-            }
+        if (existingQty + 1 > MAX_STACK) {
+            setAlert(`${item} stack is full! (max ${MAX_STACK})`);
+            setTimeout(() => setAlert(''), 3000);
+            return;
+        }
 
-            if (updatedHotbar[targetIndex].item === item) {
-                updatedHotbar[targetIndex].quantity += 1;
-            } else {
-                updatedHotbar[targetIndex] = { item, quantity: 1 };
-            }
-            setHotbar(updatedHotbar);
+        const invCount = nextInv.get(item) || 0;
+        if (invCount <= 0) {
+            return;
+        }
+        if (invCount === 1) nextInv.delete(item);
+        else nextInv.set(item, invCount - 1);
 
-            if (currentCount === 1) next.delete(item);
-            else next.set(item, currentCount - 1);
-
-            return next;
-        });
+        nextHotbar[idx] = {
+            item,
+            quantity: existingQty + 1
+        };
+        setHotbar(nextHotbar);
+        setInventory(nextInv);
     };
 
 

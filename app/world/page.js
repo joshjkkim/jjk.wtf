@@ -16,7 +16,8 @@ import playerInventory from '../utils/inventory';
 import playerCrafting from '../utils/crafting';
 import worldChunks from '../utils/chunks';
 import worldEnemies from '../utils/enemies';
-import { InventoryModal, CraftingPanel, Hotbar, StatusBar } from '../components/HUD';
+import playerStorage from '../utils/storage';
+import { InventoryModal, CraftingPanel, Hotbar, StatusBar, ChestModal } from '../components/HUD';
 import LoadingScreen from '../components/loading';
 
 
@@ -228,15 +229,13 @@ const { handleMovement, handleStamina, checkForDeath } = useMovement({
 const { handleBasicAttack, handleStrongAttack, hasBasic, hasStrong } = useAttack({
   keys, staminaRef, itemsRef, placedItemsRef, enemiesRef, setItems, setPlacedItems, processEntitySet, processItemSet, changeCharacter
 })
-const { consumeItem, pickupLoop, pickupPressed, saveAndRestart, openChestLoop, openChestId } = useAction({
-  equippedRef, hotbarRef, setStamina, posRef, facingRef, setPlacedItems, setEquipped, setHotbar, keys, collectItemsRef, addToInventory, setCollectItems, inventoryRef, healthRef, maxHealthRef, staminaRef, setAlert, armorRef
+const { consumeItem, pickupLoop, pickupPressed, saveAndRestart, openChestLoop, openChestId, openChestInv } = useAction({
+  equippedRef, hotbarRef, setStamina, posRef, facingRef, setPlacedItems, setEquipped, setHotbar, keys, collectItemsRef, addToInventory, setCollectItems, inventoryRef, healthRef, maxHealthRef, staminaRef, setAlert, armorRef, placedItemsRef
 })
 
-  const [chestInv, setChestInv] = useState(null);
-
-  useEffect(() => {
-    setChestInv(openChestId);
-  }, [openChestId]);
+  const { putInStorage, takeFromStorage } = playerStorage({
+    placedItemsRef, posRef, inventoryRef, setInventory, setPlacedItems, setCollectItems, setAlert
+  });
 
   useEffect(() => {
   const handleKeyDown = (e) => {
@@ -419,6 +418,18 @@ switch (facingRef.current) {
         onCraft={craftItem}
         isOpen={showInventory}
       />
+
+      { openChestId && (
+            <ChestModal 
+              chestInventory={openChestInv}
+              playerInventory={inventoryRef.current}
+              onTake={item => takeFromStorage(openChestId, item)}
+              onStore={item => putInStorage(openChestId, item)}
+              onClose={() => setOpenChestId(null)}
+              isOpen={true}
+            />
+          )
+        }
 
     {alert && (
         <div className="fixed top-8 inset-x-0 mx-auto w-11/12 max-w-md bg-red-800/90 text-white font-mono rounded-lg shadow-lg z-50 animate-slide-down">

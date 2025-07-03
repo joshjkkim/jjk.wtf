@@ -297,4 +297,86 @@ if (typeof document !== 'undefined') {
   document.head.appendChild(styleSheet);
 }
 
-export default { InventoryModal, CraftingPanel, Hotbar, StatusBar };
+  export function ChestModal({
+    chestInventory,
+    playerInventory,
+    onTake,
+    onStore,
+    onClose,
+    isOpen
+  }) {
+    const entries = chestInventory instanceof Map
+  ? Array.from(chestInventory.entries())
+  : Object.entries(chestInventory);
+    console.log("Chest Inventory:", chestInventory);
+    return (
+      <>
+        <div
+          className={`fixed inset-0 bg-black/60 z-40 transition-opacity duration-300 ${
+            isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
+          }`}
+          onClick={onClose}
+        />
+
+        <div
+          className={`fixed top-1/2 left-1/2 z-50 w-[50vw] max-w-4xl h-[60vh]
+                      bg-gradient-to-br from-slate-800/90 via-slate-900/95 to-black/90
+                      backdrop-blur-lg text-white rounded-2xl shadow-2xl border border-slate-600/30
+                      transform transition-all duration-500 ease-out
+                      -translate-x-1/2 -translate-y-1/2 ${
+                        isOpen ? 'opacity-100 scale-100' : 'opacity-0 scale-90 pointer-events-none'
+                      }`}
+        >
+          <div className="flex justify-between items-center p-4 border-b border-slate-600/30">
+            <h3 className="text-2xl font-bold">📦 Chest</h3>
+            <button onClick={onClose} className="text-xl">✖️</button>
+          </div>
+
+          <div className="flex h-[calc(100%-56px)]">
+
+            <div className="w-1/2 p-4 overflow-y-auto border-r border-slate-600/30 custom-scrollbar">
+              <h4 className="text-lg mb-2">Chest Items</h4>
+              <div className="grid grid-cols-6 gap-3">
+                {entries.map(([item, count]) => (
+                  <button
+                    key={item}
+                    onClick={() => onTake(item)}
+                    className="flex flex-col items-center p-2 bg-slate-700/50 rounded hover:bg-slate-700 transition"
+                  >
+                    <div
+                      className="w-10 h-10 bg-cover bg-center mb-1"
+                      style={{ backgroundImage: `url(${TEXTURE_MAP.get(item)})` }}
+                    />
+                    <span className="text-xs">{item}</span>
+                    <span className="text-[0.6rem]">×{count}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="w-1/2 p-4 overflow-y-auto custom-scrollbar">
+              <h4 className="text-lg mb-2">Your Inventory</h4>
+              <div className="grid grid-cols-6 gap-3">
+                {Array.from(playerInventory.entries()).map(([item, count]) => (
+                  <button
+                    key={item}
+                    onClick={() => onStore(item)}
+                    className="flex flex-col items-center p-2 bg-slate-700/50 rounded hover:bg-slate-700 transition"
+                  >
+                    <div
+                      className="w-10 h-10 bg-cover bg-center mb-1"
+                      style={{ backgroundImage: `url(${TEXTURE_MAP.get(item)})` }}
+                    />
+                    <span className="text-xs">{item}</span>
+                    <span className="text-[0.6rem]">×{count}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </>
+    );
+  }
+
+export default { InventoryModal, CraftingPanel, Hotbar, StatusBar, ChestModal };

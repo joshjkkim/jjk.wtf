@@ -159,6 +159,7 @@ export default function worldChunks({ chunkBiomes, CHUNK_SIZE, loadedChunks, set
             const damage = toolMap?.get(item.type) ?? 0;
         
             if (dist < item.size + 15 * multi) {
+                if (item.inventory.size) return true;
             item.health -= damage * multi;
         
             if (item.health <= 0) {

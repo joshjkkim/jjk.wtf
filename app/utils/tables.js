@@ -46,6 +46,7 @@ export const TOOL_EFFECTIVENESS = new Map([
     ['bush', 0.1],
     ['wood', 2],
     ['workbench', 2],
+    ['chest', 2],
     ['rock', 2],
     ['cactus', 1],
     ['dead bush', 2],
@@ -65,6 +66,7 @@ export const TOOL_EFFECTIVENESS = new Map([
     ['stone', 0.3],
     ['wood', 3],
     ['workbench', 3],
+    ['chest', 2],
     ['rock', 3],
     ['cactus', 4],
     ['dead bush', 2],
@@ -84,6 +86,7 @@ export const TOOL_EFFECTIVENESS = new Map([
     ['stone', 0.2],
     ['wood', 2],
     ['workbench', 2],
+    ['chest', 2],
     ['rock', 1],
     ['cactus', 2],
     ['dead bush', 1.3],
@@ -102,6 +105,7 @@ export const TOOL_EFFECTIVENESS = new Map([
     ['stone', 0.05],
     ['tree', 0.05],
     ['wood', 0.5],
+    ['chest', 2],
     ['rock', 0],
     ['workbench', 0.5],
     ['cactus', 0.5],
@@ -140,6 +144,9 @@ export const LOOT_TABLE = new Map([
   ]],
   ['workbench', [
     { item: 'workbench', chance: 1, min: 1, max: 1 },
+  ]],
+  ['chest', [
+    { item: 'chest', chance: 1, min: 1, max: 1 },
   ]],
   ['dead bush', [
     { item: 'wood', chance: 0.8, min: 1, max: 2 },
@@ -292,6 +299,14 @@ export const CRAFTING_RECIPES = [
     ],
     level: 1,
   },
+  {
+    output: { item: 'chest', quantity: 1 },
+    ingredients: [
+      { item: 'stick', quantity: 10 },
+      { item: 'rock', quantity: 5 },
+    ],
+    level: 1,
+  },
 ];
 
 export const CONSUMABLES = [
@@ -302,6 +317,7 @@ export const CONSUMABLES = [
   { item: 'wood', ability: 'PLACEABLE', amount: 10 },
   { item: 'rock', ability: 'PLACEABLE', amount: 25 },
   { item: 'workbench', ability: 'PLACEABLE', amount: 10 },
+  { item: 'chest', ability: 'PLACEABLE', amount: 10 },
   { item: 'meat', ability: 'STAMINA', amount: 150 },
 ]
 
@@ -369,6 +385,7 @@ export const TEXTURE_MAP = new Map([
   ['leaf helmet', '/leaf_helmet.png'],
   ['leaf plate', '/leaf_plate.png'],
   ['leaf pants', '/leaf_pants.png'],
+  ['chest', '/chest.png'],
 ]);
 
 export const ALL_TEXTURES = Array.from(TEXTURE_MAP.values());
@@ -395,5 +412,5 @@ export const ARMOR_STATS = {
 };
 
 export const STORAGE_STATS = [
-  { item: 'chest', inventory: 20 },
+  { item: 'chest', inventory: 5 },
 ]

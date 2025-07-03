@@ -9,6 +9,7 @@ const IMAGE_MAP = {
   'dead bush': '/dead_bush.png',
   ironNode: '/iron_node.png',
   goldNode: '/gold_node.gif',
+  chest: '/chest.png',
 
   wolf: '/wolf.gif',
   boar: '/boar.gif',

@@ -8,6 +8,7 @@ export default function useAction({equippedRef, hotbarRef, setStamina, posRef, f
     const countdownRef = useRef()
     const pickupPressed = useRef(false);
     const [openChestId, setOpenChestId] = useState(null);
+    const [openChestInv, setOpenChestInv] = useState(null);
     
     const consumeItem = useCallback(() => {
         const held = equippedRef.current;
@@ -33,19 +34,20 @@ export default function useAction({equippedRef, hotbarRef, setStamina, posRef, f
             facing === 'down' ? pos.y + offset :
             facing === 'up' ? pos.y - offset : pos.y;
 
-            let invAmt = STORAGE_STATS.find(c => c.item === held).inventory;
-            if (!invAmt) invAmt = 0;
+            const stats = STORAGE_STATS.find(c => c.item === held);
+            const invAmt = stats ? stats.inventory : 0;
+
 
             const placed = {
-            id: crypto.randomUUID(),
-            size: 40,
-            type: held,
-            x: newX,
-            y: newY,
-            health: consumable.amount,
-            maxHealth: consumable.amount,
-            invAmount: invAmt,
-            inventory: invAmt ? new Map() : null,
+                id: crypto.randomUUID(),
+                size: 40,
+                type: held,
+                x: newX,
+                y: newY,
+                health: consumable.amount,
+                maxHealth: consumable.amount,
+                invAmount: invAmt,
+                inventory: invAmt ? new Map() : null,
             };
 
             setPlacedItems(prev => [...prev, placed]);
@@ -164,15 +166,18 @@ export default function useAction({equippedRef, hotbarRef, setStamina, posRef, f
   ])
 
     const openChestLoop = useCallback(() => {
-        const down = keys.current['e'];
-        if (down && !prevERef.current) {
-            const chestInv = playerStorage({ placedItemsRef, posRef }).getNearbyChest();
-            if (chestInv) {
-            setOpenChestId(chestInv);
+        const isDown = keys.current['e'];
+
+        if (isDown) {
+            console.log("Meow")
+            const {inventory, id} = playerStorage({ placedItemsRef, posRef }).getNearbyChest();
+            if (id) {
+            setOpenChestId(id);
+            setOpenChestInv(inventory)
             }
         }
-        prevERef.current = down;
-    }, [keys, placedItemsRef, posRef]);
+        prevERef.current = isDown;
+    }, [keys, prevERef, placedItemsRef, posRef]);
 
     const saveHome = useCallback(async () => {
         const payload = {
@@ -197,7 +202,7 @@ export default function useAction({equippedRef, hotbarRef, setStamina, posRef, f
         }
     })
 
-    return { consumeItem, pickupLoop, pickupPressed, saveHome, saveAndRestart, openChestLoop, openChestId }
+    return { consumeItem, pickupLoop, pickupPressed, saveHome, saveAndRestart, openChestLoop, openChestId, openChestInv, setOpenChestId }
 }
 
 

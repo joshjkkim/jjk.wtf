@@ -16,7 +16,8 @@ import playerInventory from '../utils/inventory';
 import playerCrafting from '../utils/crafting';
 import worldChunks from '../utils/chunks';
 import worldEnemies from '../utils/enemies';
-import { InventoryModal, CraftingPanel, Hotbar, StatusBar } from '../components/HUD';
+import playerStorage from '../utils/storage';
+import { InventoryModal, CraftingPanel, Hotbar, StatusBar, ChestModal } from '../components/HUD';
 import LoadingScreen from '../components/loading';
 
 
@@ -201,8 +202,18 @@ const visiblePlaceables = placedItems.filter(item => {
         const result = await fetch('/api/home/load', { method: 'GET'})
         const { home } = await result.json()
 
-        setPlacedItems(home);
-        placedItemsRef.current= home;
+        const realHome = home.map(item => {
+        if (item.invAmount && item.inventory != null) {
+          return {
+            ...item,
+            inventory: new Map(Object.entries(item.inventory))
+          };
+        }
+        return item;
+      });
+
+        setPlacedItems(realHome);
+        placedItemsRef.current= realHome;
 
       } catch (err) {
         console.error(err)
@@ -237,30 +248,45 @@ const { handleMovement, handleStamina, checkForDeath } = useMovement({
 const { handleBasicAttack, handleStrongAttack, hasBasic, hasStrong } = useAttack({
   keys, staminaRef, itemsRef, placedItemsRef, enemiesRef, setItems, setPlacedItems, processEntitySet, processItemSet, changeCharacter
 })
-const { consumeItem, pickupLoop, pickupPressed, saveAndRestart } = useAction({
-  equippedRef, hotbarRef, setStamina, posRef, facingRef, setPlacedItems, setEquipped, setHotbar, keys, collectItemsRef, addToInventory, setCollectItems, inventoryRef, healthRef, maxHealthRef, staminaRef, setAlert, armorRef
+const { consumeItem, pickupLoop, pickupPressed, saveAndRestart, openChestId, openChestInv, openChestLoop, setOpenChestId } = useAction({
+  equippedRef, hotbarRef, setStamina, posRef, facingRef, setPlacedItems, setEquipped, setHotbar, keys, collectItemsRef, addToInventory, setCollectItems, inventoryRef, healthRef, maxHealthRef, staminaRef, setAlert, armorRef, placedItemsRef
 })
 
-  useEffect(() => {
-        const saveHome = async () => {
-        const payload = {
-        placedItems:    placedItemsRef.current,
-        }
+  const { putInStorage, takeFromStorage } = playerStorage({
+    placedItemsRef, posRef, inventoryRef, setInventory, setPlacedItems, setCollectItems, setAlert
+  });
 
-        try {
-        const res = await fetch('/api/home/save', {
-            method:  'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body:    JSON.stringify(payload),
-        })
-        if (!res.ok) {
-            throw new Error(`Save failed: ${res.status}`)
-        }
-        await res.json()
-        } catch (e) {
-        console.error(e)
-        setAlert("Save failed. Check console.")
-        }
+
+  useEffect(() => {
+    const saveHome = async () => {
+      const serializablePlaced = placedItemsRef.current.map(item => {
+      if (item.invAmount && item.inventory instanceof Map) {
+        return {
+          ...item,
+          inventory: Object.fromEntries(item.inventory.entries())
+        };
+      }
+      return item;
+      } );
+
+      const payload = {
+      placedItems: serializablePlaced
+    };
+
+  try {
+    const res = await fetch('/api/home/save', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify(payload),
+      })
+      if (!res.ok) {
+          throw new Error(`Save failed: ${res.status}`)
+      }
+      await res.json()
+      } catch (e) {
+      console.error(e)
+      setAlert("Save failed. Check console.")
+      }
     }
 
   const handleKeyDown = async (e) => {
@@ -310,6 +336,7 @@ const { consumeItem, pickupLoop, pickupPressed, saveAndRestart } = useAction({
       handleBasicAttack();
       handleStrongAttack();
       pickupLoop();
+      openChestLoop();
 
       if (++frameRef.current >= 4) {
         handleStamina();
@@ -418,6 +445,19 @@ switch (facingRef.current) {
         />
       </div>
     </div>
+
+    { openChestId && (
+            <ChestModal 
+              chestInventory={openChestInv}
+              playerInventory={inventoryRef.current}
+              onTake={item => takeFromStorage(openChestId, item)}
+              onStore={item => putInStorage(openChestId, item)}
+              onClose={() => setOpenChestId(null)}
+              isOpen={true}
+            />
+          )
+        }
+    
 
     <InventoryModal
         inventory={inventory}
