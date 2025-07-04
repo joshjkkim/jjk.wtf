@@ -62,6 +62,7 @@ const GameItem = React.memo(function GameItem({
   hitboxRadius,
   playerPos = null,
   onCollideChange = () => {},
+  charging= false, // For enemies, if they are charging an attack
 }) {
   const colliding = useCollision({
     id,
@@ -92,12 +93,16 @@ const GameItem = React.memo(function GameItem({
   const hp = useMemo(() => (maxHealth > 0 ? (health / maxHealth) * 100 : 0), [health, maxHealth]);
   const barColor = hp > 50 ? 'limegreen' : hp > 25 ? 'orange' : 'red';
 
+  const warning = charging
+    ? { filter: 'drop-shadow(0 0 8px red)' }
+    : {};
+
   return (
     <div
       className={`absolute flex items-center justify-center font-mono text-xs text-white rounded-full shadow-lg bg-black/20 p-5 transition-border duration-200 ${
         colliding ? 'border-yellow-400 border-2' : 'border-transparent'
       }`}
-      style={containerStyle}
+      style={{ ...containerStyle, ...warning }}
     >
       {maxHealth > 0 && health < maxHealth && (
         <div className="absolute bottom-full mb-1 w-full h-1 bg-white/30 rounded overflow-hidden">

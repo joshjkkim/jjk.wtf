@@ -19,6 +19,7 @@ import worldEnemies from '../utils/enemies';
 import playerStorage from '../utils/storage';
 import { InventoryModal, CraftingPanel, Hotbar, StatusBar, ChestModal } from '../components/HUD';
 import LoadingScreen from '../components/loading';
+import DeathScreen from '../components/death';
 
 
 export default function GamePage() {
@@ -324,12 +325,7 @@ if (!isLoaded) {
 
 if (isDeadRef.current) {
   return (
-    <div className="w-screen h-screen bg-black text-white flex flex-col items-center justify-center">
-      <h1 className="text-[15vw] hover:rotate-360 hover:scale-200 transition-all duration-1000 ease-in-out" onClick={() => window.location.reload()}>💀</h1>
-      <h2 className="text-[5vw]">You died!</h2>
-      <p>Unfortunately your progress has been cleared...</p>
-      <p>Click the skull to continue</p>
-    </div>
+    <DeathScreen />
   );
 }
 
@@ -572,18 +568,19 @@ switch (facingRef.current) {
       ))}
 
       {enemies.map(en => (
-  <GameItem
-    key={en.id}
-    id={en.id}
-    x={en.x}
-    y={en.y}
-    size={en.size}
-    type={en.type}
-    health={en.health}
-    maxHealth={en.maxHealth}
-    playerPos={pos}
-  />
-))}
+        <GameItem
+          key={en.id}
+          id={en.id}
+          x={en.x}
+          y={en.y}
+          size={en.size}
+          type={en.type}
+          health={en.health}
+          maxHealth={en.maxHealth}
+          playerPos={pos}
+          charging={en.isCharging}
+        />
+      ))}
     </div>
   </div>
 );

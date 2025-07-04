@@ -15,15 +15,15 @@ export const BIOME_ENEMIES = {
 };
 
 export const ENEMY_STATS = {
-  wolf:      { size: 50, speed: 0.6, health: 90, attack: 8, attackRange: 25, attackCooldown: 500 },
-  boar:      { size: 60, speed: 0.4, health: 170, attack: 20, attackRange: 30, attackCooldown: 1000 },
-  deer:  { size: 55, speed: 0.5, health: 90, attack: 1,  attackRange: 30, attackCooldown: 1000 },
-  scorpion:  { size: 40, speed: 0.8, health: 80, attack: 5,  attackRange: 20, attackCooldown: 600 },
-  camel:  { size: 70, speed: 0.3, health: 200, attack: 2,  attackRange: 30, attackCooldown: 1000 },
-  snake:  { size: 60, speed: 0.8, health: 90, attack: 12,  attackRange: 40, attackCooldown: 1200 },
-  bat:  { size: 40, speed: 0.9, health: 80, attack: 7,  attackRange: 20, attackCooldown: 600 },
-  spider:  { size: 60, speed: 0.8, health: 100, attack: 13,  attackRange: 40, attackCooldown: 700 },
-  rock_monster:  { size: 150, speed: 0.4, health: 250, attack: 40,  attackRange: 50, attackCooldown: 1500 },
+  wolf:      { size: 50, speed: 0.6, health: 90, attack: 8, attackRange: 25, attackCooldown: 1000, knockback: 10, warningDuration: 500 },
+  boar:      { size: 60, speed: 0.4, health: 170, attack: 20, attackRange: 30, attackCooldown: 1000, knockback: 15, warningDuration: 600 },
+  deer:  { size: 55, speed: 0.5, health: 90, attack: 1,  attackRange: 30, attackCooldown: 1000, knockback: 5, warningDuration: 400 },
+  scorpion:  { size: 40, speed: 0.8, health: 80, attack: 5,  attackRange: 20, attackCooldown: 600, knockback: 8, warningDuration: 300 },
+  camel:  { size: 70, speed: 0.3, health: 200, attack: 2,  attackRange: 30, attackCooldown: 1000, knockback: 12, warningDuration: 700 },
+  snake:  { size: 60, speed: 0.8, health: 90, attack: 12,  attackRange: 40, attackCooldown: 1200, knockback: 10, warningDuration: 500 },
+  bat:  { size: 40, speed: 0.9, health: 80, attack: 7,  attackRange: 20, attackCooldown: 600, knockback: 5, warningDuration: 300 },
+  spider:  { size: 60, speed: 0.8, health: 100, attack: 13,  attackRange: 40, attackCooldown: 700, knockback: 8, warningDuration: 400 },
+  rock_monster:  { size: 150, speed: 0.4, health: 250, attack: 40,  attackRange: 50, attackCooldown: 1500, knockback: 20, warningDuration: 800 },
 };
 
 export const TOOL_EFFECTIVENESS = new Map([

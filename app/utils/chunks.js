@@ -48,7 +48,10 @@ export default function worldChunks({ chunkBiomes, CHUNK_SIZE, loadedChunks, set
                 attack: stats.attack,
                 attackRange: stats.attackRange,
                 cooldown: stats.attackCooldown,
+                knockback: stats.knockback,
                 lastAttack: 0,
+                isCharging: false,
+                warningDuration: stats.warningDuration,          
             });
         }
         enemiesRef.current.push(...newEn);

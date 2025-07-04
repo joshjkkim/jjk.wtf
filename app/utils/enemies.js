@@ -53,18 +53,25 @@ export default function worldEnemies({ itemsRef, placedItemsRef, posRef, enemies
         }
     }
 
-
     const handleEnemyAttacks = (now) => {
         for (const en of enemiesRef.current) {
             const dx = posRef.current.x - en.x;
             const dy = posRef.current.y - en.y;
-            const dist = Math.hypot(dx,dy);
-            if (dist < en.attackRange && now - en.lastAttack > en.cooldown) {
-                en.lastAttack = now;
-                healthRef.current = Math.max(0, healthRef.current - en.attack);
+            const dist = Math.hypot(dx, dy);
+
+            if (dist < en.attackRange && !en.isCharging && now - en.lastAttack > en.cooldown) {
+                en.isCharging = true;
+
+                setTimeout(() => {
+                    en.isCharging = false;
+                    en.lastAttack = now;
+                    healthRef.current = Math.max(0, healthRef.current - en.attack);
+                    posRef.current.x += dx * en.knockback / 5;
+                    posRef.current.y += dy * en.knockback / 5;
+                }, en.warningDuration);
             }
         }
-    }
+    };
 
     const processEntitySet = (sourceArray, damageMult) => {
         return sourceArray.filter(ent => {
