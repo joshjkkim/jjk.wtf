@@ -1,4 +1,4 @@
-import { PLANTS } from "./tables";
+import { PLANTS_STATS, PLANTS_TEXTURES } from "./tables";
 
 export default function playerGardening({ posRef, facingRef, placedItemsRef, setPlacedItems }) {
     function placeSeed(held, consumable) {
@@ -34,16 +34,16 @@ export default function playerGardening({ posRef, facingRef, placedItemsRef, set
 
             const placed = {
                 id: crypto.randomUUID(),
-                size: 40,
-                type: held,
+                size: 20,
+                type: PLANTS_STATS[held]?.name,
                 x: loc.x,
                 y: loc.y,
                 health: consumable.amount,
                 maxHealth: consumable.amount,
                 growthStage: 1,
-                growthChance: PLANTS[held]?.growthChance,
-                maxGrowthStage: PLANTS[held]?.maxGrowth,
-                growthSizeInc: PLANTS[held]?.growthSizeInc,
+                growthChance: PLANTS_STATS[held]?.growthChance,
+                maxGrowthStage: PLANTS_STATS[held]?.maxGrowth,
+                growthSizeInc: PLANTS_STATS[held]?.growthSizeInc,
             };
 
             setPlacedItems(prev =>
@@ -53,11 +53,35 @@ export default function playerGardening({ posRef, facingRef, placedItemsRef, set
                     : item
                 )
             );
+
+            return true;
         } else {
             return false;
         }
         
     }
 
-    return { placeSeed }
+    function handlePlantGrowth() {
+        setPlacedItems(prev => {
+            const next = prev.map(item => {
+            if (
+                item.growthStage != null &&
+                item.growthStage < item.maxGrowthStage &&
+                Math.random() < item.growthChance
+            ) {
+                const newStage = item.growthStage + 1;
+                return {
+                ...item,
+                growthStage: newStage,
+                size:        item.size + item.growthSizeInc,
+                };
+            }
+            return item;
+            });
+            placedItemsRef.current = next;
+            return next;
+        });
+    }
+
+    return { placeSeed, handlePlantGrowth }
 }

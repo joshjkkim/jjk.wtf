@@ -19,6 +19,7 @@ import worldEnemies from '../utils/enemies';
 import playerStorage from '../utils/storage';
 import { InventoryModal, CraftingPanel, Hotbar, StatusBar, ChestModal } from '../components/HUD';
 import LoadingScreen from '../components/loading';
+import playerGardening from '../utils/gardening';
 
 
 export default function GamePage() {
@@ -256,6 +257,10 @@ const { consumeItem, pickupLoop, pickupPressed, saveAndRestart, openChestId, ope
     placedItemsRef, posRef, inventoryRef, setInventory, setPlacedItems, setCollectItems, setAlert
   });
 
+  const { handlePlantGrowth } = playerGardening({
+    posRef, facingRef, placedItemsRef, setPlacedItems
+  })
+
 
   useEffect(() => {
     const saveHome = async () => {
@@ -263,8 +268,6 @@ const { consumeItem, pickupLoop, pickupPressed, saveAndRestart, openChestId, ope
         const out = { ...item };
 
         if (item.invAmount > 0) {
-          // if it's already a Map, grab its entries;
-          // if it's already an object (from a prior save), use it as-is—or default to {}
           if (item.inventory instanceof Map) {
             out.inventory = Object.fromEntries(item.inventory.entries());
           } else if (item.inventory && typeof item.inventory === 'object') {
@@ -273,7 +276,6 @@ const { consumeItem, pickupLoop, pickupPressed, saveAndRestart, openChestId, ope
             out.inventory = {};
           }
         } else {
-          // no inventory slot → just drop the field
           delete out.inventory;
         }
 
@@ -356,6 +358,7 @@ const { consumeItem, pickupLoop, pickupPressed, saveAndRestart, openChestId, ope
         setStamina(staminaRef.current);
         setPlacedItems([...placedItemsRef.current]);
         setCollectItems([...collectItemsRef.current]);
+        handlePlantGrowth();
 
         frameRef.current = 0;
       }
@@ -529,7 +532,7 @@ switch (facingRef.current) {
     <div
           className="absolute w-screen h-screen"
           style={{
-            backgroundImage: `url('/grass1.png')`,
+            backgroundImage: `url('/bg/grass1.png')`,
             backgroundRepeat:'repeat',
             backgroundSize:  '128px 128px',
             zIndex:          0,
@@ -541,7 +544,7 @@ switch (facingRef.current) {
         <div
           className="absolute w-[5vw] h-[5vw] bg-transparent rounded-full pointer-events-none"
           style={{
-            backgroundImage: `url('/yellowlensflare.png')`,
+            backgroundImage: `url('/item/yellowlensflare.png')`,
             backgroundSize: 'cover',
             backgroundPosition: 'center',
             left:   `${offsetX}px`,
@@ -555,7 +558,7 @@ switch (facingRef.current) {
         <div
           className="absolute w-[10vw] h-[10vw] bg-transparent rounded-full pointer-events-none"
           style={{
-            backgroundImage: `url('/yellowlensflare.png')`,
+            backgroundImage: `url('/item/yellowlensflare.png')`,
             backgroundSize: 'cover',
             backgroundPosition: 'center',
             left:   `${offsetX}px`,
@@ -618,6 +621,8 @@ switch (facingRef.current) {
           maxHealth={item.maxHealth}
           type={item.type}
           playerPos={pos}
+          size={item.size}
+          growthStage={item?.growthStage}
         />
       ))}
 

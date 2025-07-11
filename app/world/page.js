@@ -238,6 +238,12 @@ const { consumeItem, pickupLoop, pickupPressed, saveAndRestart, openChestLoop, o
     placedItemsRef, posRef, inventoryRef, setInventory, setPlacedItems, setCollectItems, setAlert
   });
 
+  
+  const { handlePlantGrowth } = playerGardening({
+    posRef, facingRef, placedItemsRef, setPlacedItems
+  })
+
+
   useEffect(() => {
   const handleKeyDown = (e) => {
     const key = e.key.toLowerCase();
@@ -299,6 +305,7 @@ const { consumeItem, pickupLoop, pickupPressed, saveAndRestart, openChestLoop, o
         setPlacedItems([...placedItemsRef.current]);
         setCollectItems([...collectItemsRef.current]);
         setEnemies([...enemiesRef.current]);
+        handlePlantGrowth();
 
         frameRef.current = 0;
       }
@@ -472,7 +479,7 @@ switch (facingRef.current) {
         <div
           className="absolute w-[5vw] h-[5vw] bg-transparent rounded-full pointer-events-none"
           style={{
-            backgroundImage: `url('/yellowlensflare.png')`,
+            backgroundImage: `url('/item/yellowlensflare.png')`,
             backgroundSize: 'cover',
             backgroundPosition: 'center',
             left:   `${offsetX}px`,
@@ -486,7 +493,7 @@ switch (facingRef.current) {
         <div
           className="absolute w-[10vw] h-[10vw] bg-transparent rounded-full pointer-events-none"
           style={{
-            backgroundImage: `url('/yellowlensflare.png')`,
+            backgroundImage: `url('/item/yellowlensflare.png')`,
             backgroundSize: 'cover',
             backgroundPosition: 'center',
             left:   `${offsetX}px`,
@@ -563,6 +570,7 @@ switch (facingRef.current) {
           health={item.health}
           maxHealth={item.maxHealth}
           type={item.type}
+          growthStage={item?.growthStage}
           playerPos={pos}
         />
       ))}

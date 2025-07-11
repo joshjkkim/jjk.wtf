@@ -154,6 +154,10 @@ export default function worldChunks({ chunkBiomes, CHUNK_SIZE, loadedChunks, set
 
     const processItemSet = (sourceItems, multi) => {
         return sourceItems.filter((item) => {
+            if (item?.growthStage < item?.maxGrowthStage) {
+                return true;
+            }
+
             const dx = posRef.current.x - item.x;
             const dy = posRef.current.y - item.y;
             const dist = Math.sqrt(dx * dx + dy * dy);

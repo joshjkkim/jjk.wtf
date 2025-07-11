@@ -64,6 +64,7 @@ export const TOOL_EFFECTIVENESS = new Map([
   ['stone axe', new Map([
     ['tree', 2],
     ['bush', 1],
+    ['strawberry bush', 1],
     ['stone', 0.3],
     ['wood', 3],
     ['workbench', 3],
@@ -85,6 +86,7 @@ export const TOOL_EFFECTIVENESS = new Map([
    ['stick', new Map([
     ['tree', 0.5],
     ['bush', 1],
+    ['strawberry bush', 1],
     ['stone', 0.2],
     ['wood', 2],
     ['workbench', 2],
@@ -105,6 +107,7 @@ export const TOOL_EFFECTIVENESS = new Map([
   ])],
   ['hands', new Map([
     ['bush', 0.3],
+    ['strawberry bush', 0.3],
     ['stone', 0.05],
     ['tree', 0.05],
     ['wood', 0.5],
@@ -392,7 +395,7 @@ export const TEXTURE_MAP = new Map([
   ['rock', '/item/stone.png'],
   ['leaf', '/item/leaf.png'],
   ['stick', '/item/stick.png'],
-  ['workbench', '/item/workbench.png'],
+  ['workbench', '/place/workbench.png'],
   ['nut', '/item/nut.png'],
   ['thorn', '/item/thorn.png'],
   ['prickly pear', '/item/pricklypear.png'],
@@ -440,6 +443,10 @@ export const STORAGE_STATS = [
   { item: 'chest', inventory: 5 },
 ]
 
-export const PLANTS = {
-  'strawberry seed': { growthChance: 0.0003, maxGrowth: 4, growthSizeInc: 20, texture: { 1 : '/plants/sprout.png', 2 : '/plants/youngbush.png', 3 : '/plants/basicbush.png', 4: '/plants/strawberry_bush.png'} },
+export const PLANTS_STATS = {
+  'strawberry seed': { name: 'strawberry bush', growthChance: 0.0003, maxGrowth: 4, growthSizeInc: 10 },
 };
+
+export const PLANTS_TEXTURES = {
+  'strawberry bush' : { texture: { 1 : '/plants/sprout.png', 2 : '/plants/youngbush.png', 3 : '/plants/basicbush.png', 4: '/plants/strawberry_bush.png'}}
+}

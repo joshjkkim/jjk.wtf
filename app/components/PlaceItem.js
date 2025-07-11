@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { TEXTURE_MAP } from '../utils/tables';
+import { PLANTS_TEXTURES, TEXTURE_MAP } from '../utils/tables';
 
 export default function PlaceItem({
   id,
@@ -10,11 +10,16 @@ export default function PlaceItem({
   type,
   size = 40,
   playerPos = null,
+  growthStage = null,
   onCollideChange = () => {},
 }) {
   const wasColliding = useRef(false);
   const hitboxRadius = size / 2;
-  const texture = TEXTURE_MAP.get(type);
+  let texture = TEXTURE_MAP.get(type);
+
+  if (growthStage) {
+    texture = PLANTS_TEXTURES[type]?.texture?.[growthStage]
+  }
 
   useEffect(() => {
     if (!playerPos) return;

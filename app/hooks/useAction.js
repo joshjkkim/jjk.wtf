@@ -57,19 +57,23 @@ export default function useAction({equippedRef, hotbarRef, setStamina, posRef, f
             setPlacedItems(prev => [...prev, placed]);
         }
 
+        let should = true;
+
         if (consumable.ability === "PLANT") {
-            placeSeed(held, consumable);
+            should = placeSeed(held, consumable);
         }
 
-        const updatedHotbar = [...hotbarRef.current]
-        if (updatedHotbar[slotIndex].quantity === 1) {
-            updatedHotbar[slotIndex] = { item: null, quantity: 0 };
-            setEquipped("hands");
-        } else {
-            updatedHotbar[slotIndex].quantity -= 1;
-        }
+        if (should) {
+            const updatedHotbar = [...hotbarRef.current]
+            if (updatedHotbar[slotIndex].quantity === 1) {
+                updatedHotbar[slotIndex] = { item: null, quantity: 0 };
+                setEquipped("hands");
+            } else {
+                updatedHotbar[slotIndex].quantity -= 1;
+            }
 
-        setHotbar(updatedHotbar);
+            setHotbar(updatedHotbar);
+        }
     }, [equippedRef, hotbarRef, setStamina, posRef, facingRef, setPlacedItems, setEquipped, setHotbar]);
 
     const prevERef = useRef(false);
