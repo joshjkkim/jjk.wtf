@@ -43,6 +43,7 @@ export const TOOL_EFFECTIVENESS = new Map([
     ['goldNode', 0.5],
     ['stone', 1],
     ['tree', 0.2],
+    ['soil', 2],
     ['bush', 0.1],
     ['wood', 2],
     ['workbench', 2],
@@ -66,6 +67,7 @@ export const TOOL_EFFECTIVENESS = new Map([
     ['stone', 0.3],
     ['wood', 3],
     ['workbench', 3],
+    ['soil', 2],
     ['chest', 2],
     ['rock', 3],
     ['cactus', 4],
@@ -86,6 +88,7 @@ export const TOOL_EFFECTIVENESS = new Map([
     ['stone', 0.2],
     ['wood', 2],
     ['workbench', 2],
+    ['soil', 2],
     ['chest', 2],
     ['rock', 1],
     ['cactus', 2],
@@ -106,6 +109,7 @@ export const TOOL_EFFECTIVENESS = new Map([
     ['tree', 0.05],
     ['wood', 0.5],
     ['chest', 2],
+    ['soil', 2],
     ['rock', 0],
     ['workbench', 0.5],
     ['cactus', 0.5],
@@ -133,7 +137,7 @@ export const LOOT_TABLE = new Map([
     { item: 'coal', chance: 0.2, min: 1, max: 1 }
   ]],
   ['bush', [
-    { item: 'berry', chance: 0.7, min: 2, max: 3 },
+    { item: 'strawberry', chance: 0.7, min: 2, max: 3 },
     { item: 'wood', chance: 0.9, min: 1, max: 1 },
   ]],
   ['wood', [
@@ -147,6 +151,9 @@ export const LOOT_TABLE = new Map([
   ]],
   ['chest', [
     { item: 'chest', chance: 1, min: 1, max: 1 },
+  ]],
+  ['soil', [
+    { item: 'soil', chance: 1, min: 1, max: 1 },
   ]],
   ['dead bush', [
     { item: 'wood', chance: 0.8, min: 1, max: 2 },
@@ -222,6 +229,20 @@ export const CRAFTING_RECIPES = [
     ingredients: [
       { item: 'meat', quantity: 1 },
       { item: 'rock', quantity: 1 },
+    ],
+    level: 0,
+  },
+  {
+    output: { item: 'soil', quantity: 1 },
+    ingredients: [
+      { item: 'wood', quantity: 1 },
+    ],
+    level: 0,
+  },
+  {
+    output: { item: 'strawberry seed', quantity: 1 },
+    ingredients: [
+      { item: 'strawberry', quantity: 3 },
     ],
     level: 0,
   },
@@ -310,7 +331,7 @@ export const CRAFTING_RECIPES = [
 ];
 
 export const CONSUMABLES = [
-  { item: 'berry', ability: 'STAMINA', amount: 50 },
+  { item: 'strawberry', ability: 'STAMINA', amount: 50 },
   { item: 'nut', ability: 'STAMINA', amount: 50 },
   { item: 'apple', ability: 'STAMINA', amount: 100 },
   { item: 'prickly pear', ability: 'STAMINA', amount: 100 },
@@ -319,6 +340,8 @@ export const CONSUMABLES = [
   { item: 'workbench', ability: 'PLACEABLE', amount: 10 },
   { item: 'chest', ability: 'PLACEABLE', amount: 10 },
   { item: 'meat', ability: 'STAMINA', amount: 150 },
+  { item: 'soil', ability: 'PLACEABLE', amount: 10 },
+  { item: 'strawberry seed', ability: 'PLANT', amount: 10 },
 ]
 
 export const STATION_LEVELS = new Map([
@@ -356,36 +379,38 @@ export const TYPE_STATS = new Map([
 ]);
 
 export const TEXTURE_MAP = new Map([
-  ['hands', '/fist.png'],
-  ['stone pickaxe', '/pickaxe.png'],
-  ['stone axe', '/axe.png'],
-  ['stone sword', '/stone_sword.png'],
-  ['bone', '/bone.png'],
-  ['wood', '/wood.png'],
-  ['berry', '/berry.png'],
-  ['coal', '/coal.png'],
-  ['apple', '/apple.png'],
-  ['rock', '/stone.png'],
-  ['leaf', '/leaf.png'],
-  ['stick', '/stick.png'],
-  ['workbench', '/workbench.png'],
-  ['nut', '/nut.png'],
-  ['thorn', '/thorn.png'],
-  ['prickly pear', '/pricklypear.png'],
-  ['meat', '/meat.png'],
-  ['hide', '/hide.png'],
-  ['walkietalkie', '/walkietalkie.gif'],
-  ['bat wing', '/bat_wing.png'],
-  ['fang', '/stinger.png'],
-  ['gold ore', '/gold_ore.png'],
-  ['iron ore', '/iron_ore.png'],
-  ['raw gold', '/raw_gold.png'],
-  ['raw iron', '/raw_iron.png'],
-  ['leaf boots', '/leaf_boots.png'],
-  ['leaf helmet', '/leaf_helmet.png'],
-  ['leaf plate', '/leaf_plate.png'],
-  ['leaf pants', '/leaf_pants.png'],
-  ['chest', '/chest.png'],
+  ['hands', '/item/fist.png'],
+  ['stone pickaxe', '/item/pickaxe.png'],
+  ['stone axe', '/item/axe.png'],
+  ['stone sword', '/item/stone_sword.png'],
+  ['bone', '/item/bone.png'],
+  ['wood', '/item/wood.png'],
+  ['strawberry', '/item/berry.png'],
+  ['strawberry seed', '/item/strawberry_seed.png'],
+  ['coal', '/item/coal.png'],
+  ['apple', '/item/apple.png'],
+  ['rock', '/item/stone.png'],
+  ['leaf', '/item/leaf.png'],
+  ['stick', '/item/stick.png'],
+  ['workbench', '/item/workbench.png'],
+  ['nut', '/item/nut.png'],
+  ['thorn', '/item/thorn.png'],
+  ['prickly pear', '/item/pricklypear.png'],
+  ['meat', '/item/meat.png'],
+  ['hide', '/item/hide.png'],
+  ['walkietalkie', '/item/walkietalkie.gif'],
+  ['bat wing', '/item/bat_wing.png'],
+  ['fang', '/item/stinger.png'],
+  ['gold ore', '/item/gold_ore.png'],
+  ['iron ore', '/item/iron_ore.png'],
+  ['raw gold', '/item/raw_gold.png'],
+  ['raw iron', '/item/raw_iron.png'],
+  ['leaf boots', '/item/leaf_boots.png'],
+  ['leaf helmet', '/item/leaf_helmet.png'],
+  ['leaf plate', '/item/leaf_plate.png'],
+  ['leaf pants', '/item/leaf_pants.png'],
+  ['chest', '/place/chest.png'],
+  ['soil', '/item/soil.png'],
 ]);
 
 export const ALL_TEXTURES = Array.from(TEXTURE_MAP.values());
@@ -399,9 +424,9 @@ export const MAX_SLOTS = 7;
 export const MAX_STACK = 50;
 
 export const  TILE_VARIANTS = {
-  forest: ['/grass1.png','/grass2.png','/grass3.png'],
-  desert: ['/sand1.png','/sand2.png'],
-  shallowCave: ['/rock1.png'],
+  forest: ['/bg/grass1.png','/bg/grass2.png','/bg/grass3.png'],
+  desert: ['/bg/sand1.png','/bg/sand2.png'],
+  shallowCave: ['/bg/rock1.png'],
 }
 
 export const ARMOR_STATS = {
@@ -414,3 +439,7 @@ export const ARMOR_STATS = {
 export const STORAGE_STATS = [
   { item: 'chest', inventory: 5 },
 ]
+
+export const PLANTS = {
+  'strawberry seed': { growthChance: 0.0003, maxGrowth: 4, growthSizeInc: 20, texture: { 1 : '/plants/sprout.png', 2 : '/plants/youngbush.png', 3 : '/plants/basicbush.png', 4: '/plants/strawberry_bush.png'} },
+};

@@ -203,14 +203,14 @@ const visiblePlaceables = placedItems.filter(item => {
         const { home } = await result.json()
 
         const realHome = home.map(item => {
-        if (item.invAmount && item.inventory != null) {
-          return {
-            ...item,
-            inventory: new Map(Object.entries(item.inventory))
-          };
-        }
-        return item;
-      });
+          if (item.invAmount > 0 && item.inventory != null) {
+            return {
+              ...item,
+              inventory: new Map(Object.entries(item.inventory)),
+            };
+          }
+          return { ...item, inventory: null };
+        });
 
         setPlacedItems(realHome);
         placedItemsRef.current= realHome;
@@ -260,14 +260,25 @@ const { consumeItem, pickupLoop, pickupPressed, saveAndRestart, openChestId, ope
   useEffect(() => {
     const saveHome = async () => {
       const serializablePlaced = placedItemsRef.current.map(item => {
-      if (item.invAmount && item.inventory instanceof Map) {
-        return {
-          ...item,
-          inventory: Object.fromEntries(item.inventory.entries())
-        };
-      }
-      return item;
-      } );
+        const out = { ...item };
+
+        if (item.invAmount > 0) {
+          // if it's already a Map, grab its entries;
+          // if it's already an object (from a prior save), use it as-is—or default to {}
+          if (item.inventory instanceof Map) {
+            out.inventory = Object.fromEntries(item.inventory.entries());
+          } else if (item.inventory && typeof item.inventory === 'object') {
+            out.inventory = item.inventory;
+          } else {
+            out.inventory = {};
+          }
+        } else {
+          // no inventory slot → just drop the field
+          delete out.inventory;
+        }
+
+        return out;
+      });
 
       const payload = {
       placedItems: serializablePlaced

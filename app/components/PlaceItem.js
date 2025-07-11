@@ -1,11 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-
-const PLACEABLES_TEXTURE = new Map([
-  ['wood', '/wood_wall.png'],
-  ['rock', '/stone_wall.png'],
-  ['workbench', '/workbench.png'],
-  ['chest', '/chest.png'],
-]);
+import { TEXTURE_MAP } from '../utils/tables';
 
 export default function PlaceItem({
   id,
@@ -20,7 +14,7 @@ export default function PlaceItem({
 }) {
   const wasColliding = useRef(false);
   const hitboxRadius = size / 2;
-  const texture = PLACEABLES_TEXTURE.get(type);
+  const texture = TEXTURE_MAP.get(type);
 
   useEffect(() => {
     if (!playerPos) return;

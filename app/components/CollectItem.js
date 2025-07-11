@@ -1,17 +1,4 @@
-const COLLECTABLES_PHOTO = new Map([
-    ['leaf', '/leaf.png'],
-    ['wood', '/wood.png'],
-    ['rock', '/stone.png'],
-    ['coal', '/coal.png'],
-    ['berry', '/berry.png'],
-    ['apple', '/apple.png'],
-    ['workbench', '/workbench.png'],
-    ['nut', '/nut.png'],
-    ['thorn', '/thorn.png'],
-    ['prickly pear', '/pricklypear.png'],
-    ['meat', '/meat.png'],
-    ['hide', '/hide.png'],
-])
+import { TEXTURE_MAP } from "../utils/tables";
 
 export default function CollectItem({ x, y, itemType }) {
   return (
@@ -29,7 +16,7 @@ export default function CollectItem({ x, y, itemType }) {
         style={{
           width: '16px',
           height: '16px',
-          backgroundImage: `url(${COLLECTABLES_PHOTO.get(itemType)})`,
+          backgroundImage: `url(${TEXTURE_MAP.get(itemType)})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           flexShrink: 0,

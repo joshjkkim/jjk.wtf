@@ -2,26 +2,27 @@ import React, { useEffect, useRef, useMemo } from 'react';
 
 // Default images for item types
 const IMAGE_MAP = {
-  stone: '/rock.png',
-  bush: '/bush.gif',
-  tree: '/tree.gif',
-  cactus: '/cactus.png',
-  'dead bush': '/dead_bush.png',
-  ironNode: '/iron_node.png',
-  goldNode: '/gold_node.gif',
-  chest: '/chest.png',
+  stone: '/place/rock.png',
+  bush: '/place/bush.gif',
+  tree: '/place/tree.gif',
+  cactus: '/place/cactus.png',
+  'dead bush': '/place/dead_bush.png',
+  ironNode: '/place/iron_node.png',
+  goldNode: '/place/gold_node.gif',
+  chest: '/place/chest.png',
+  soil: '/item/soil.png',
 
-  wolf: '/wolf.gif',
-  boar: '/boar.gif',
-  deer: '/deer.gif',
+  wolf: '/creature/wolf.gif',
+  boar: '/creature/boar.gif',
+  deer: '/creature/deer.gif',
 
-  scorpion: '/scorpion.gif',
-  snake: '/snake.gif',
-  camel: '/camel.gif',
-  
-  bat: '/bat.gif',
-  spider: '/spider.gif',
-  rock_monster: '/rock_monster.gif',
+  scorpion: '/creature/scorpion.gif',
+  snake: '/creature/snake.gif',
+  camel: '/creature/camel.gif',
+
+  bat: '/creature/bat.gif',
+  spider: '/creature/spider.gif',
+  rock_monster: '/creature/rock_monster.gif',
 };
 
 const Z_INDEX_MAP = {

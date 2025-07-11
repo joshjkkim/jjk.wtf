@@ -1,7 +1,10 @@
 import { useState, useCallback, useRef } from "react";
 import { CONSUMABLES, MAX_SLOTS, MAX_STACK, STORAGE_STATS } from "../utils/tables";
+import playerGardening from "../utils/gardening";
 import { useRouter } from "next/navigation";
 import playerStorage from "../utils/storage";
+
+
 
 export default function useAction({equippedRef, hotbarRef, setStamina, posRef, facingRef, setPlacedItems, setEquipped, setHotbar, keys, collectItemsRef, addToInventory, setCollectItems, inventoryRef, healthRef, maxHealthRef, staminaRef, setAlert, armorRef, placedItemsRef}) {
     const router = useRouter()
@@ -9,6 +12,7 @@ export default function useAction({equippedRef, hotbarRef, setStamina, posRef, f
     const pickupPressed = useRef(false);
     const [openChestId, setOpenChestId] = useState(null);
     const [openChestInv, setOpenChestInv] = useState(null);
+    const { placeSeed } = playerGardening({ posRef, facingRef, placedItemsRef, setPlacedItems });
     
     const consumeItem = useCallback(() => {
         const held = equippedRef.current;
@@ -51,6 +55,10 @@ export default function useAction({equippedRef, hotbarRef, setStamina, posRef, f
             };
 
             setPlacedItems(prev => [...prev, placed]);
+        }
+
+        if (consumable.ability === "PLANT") {
+            placeSeed(held, consumable);
         }
 
         const updatedHotbar = [...hotbarRef.current]
