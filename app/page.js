@@ -3,16 +3,17 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "./components/Link";
-import Audio from "./components/Audio";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
+  const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
   const [contentVisible, setContentVisible] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
   const handleClick = () => {
-    if (url) {
-      window.open("https://github.com/joshjkkim", "_blank");
-    }
+
+      router.push("/register")
+
   };
 
   useEffect(() => {
@@ -76,21 +77,22 @@ export default function Home() {
             display: 'inline-block'
           }}
         >
-          <span onClick={handleClick}>jjk.wtf</span>
+          <span onClick={handleClick} style={{zIndex: 10}} className="bg-black/20 p-2 rounded-lg">Click To Play</span>
           <span 
-            className="absolute inset-0 w-full"
+            className="absolute inset-0 w-full pointer-events-none"
             style={{
               background: 'linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.8), transparent)',
               transform: 'translateX(-100%)',
               animation: 'shine 3s infinite linear',
               backgroundSize: '200% 100%',
+              backgroundColor: 'purple',
               WebkitBackgroundClip: 'text',
               backgroundClip: 'text',
               color: 'transparent',
-              zIndex: 2
+              zIndex: 1
             }}
           >
-            ???????
+            <span>??????????????</span>
           </span>
         </h1>
 

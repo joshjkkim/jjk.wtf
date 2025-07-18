@@ -444,7 +444,7 @@ export const STORAGE_STATS = [
 ]
 
 export const PLANTS_STATS = {
-  'strawberry seed': { name: 'strawberry bush', growthChance: 0.0003, maxGrowth: 4, growthSizeInc: 10 },
+  'strawberry seed': { name: 'strawberry bush', growthChance: 0.00008, maxGrowth: 4, growthSizeInc: 10 },
 };
 
 export const PLANTS_TEXTURES = {

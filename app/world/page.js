@@ -20,6 +20,7 @@ import playerStorage from '../utils/storage';
 import { InventoryModal, CraftingPanel, Hotbar, StatusBar, ChestModal } from '../components/HUD';
 import LoadingScreen from '../components/loading';
 import DeathScreen from '../components/death';
+import playerGardening from '../utils/gardening';
 
 
 export default function GamePage() {
